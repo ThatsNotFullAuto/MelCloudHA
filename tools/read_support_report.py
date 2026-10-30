@@ -7,6 +7,18 @@ from pathlib import Path
 
 def summarize(raw):
     data = raw.get("data", raw)
+    if "diagnostic_test" in data or data.get("format") == "melcloud_diagnostics.diagnostic_test":
+        from custom_components.melcloud_diagnostics.core.test_session import validate_report
+
+        report = validate_report(data.get("diagnostic_test", data))
+        return "\n".join([
+            "Diagnostic test (read only)",
+            f"Status: {report['session']['status']}",
+            f"Acquisition counts: {report['acquisition']['successful']} successful, {report['acquisition']['failed']} failed",
+            f"History: {report['fault_history']['status']}",
+            f"Checks: {json.dumps(report['verification_results'])}",
+            "Physical accuracy: UNKNOWN",
+        ])
     support = data.get("support", {})
     if (
         support.get("format") != "melcloud_diagnostics.support"

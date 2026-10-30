@@ -1,5 +1,92 @@
 # Changelog
 
+## [0.4.0] - 2026-10-30
+
+**Release ordinaria. Nessun collaudo con account Mitsubishi o impianto reale
+è stato eseguito. Screenshot del frontend HA reale con dati sintetici.**
+
+### Aggiunto
+
+- **Collaudo diagnostico guidato**: selezione pompa, 20/60 minuti, avvio,
+  stato, barra reale, durata, tempi, contatori e stop della sola raccolta.
+- Session manager indipendente dal wizard: chiudere il browser non ferma il
+  lavoro. Scadenza, stop, reload e riavvio conservano risultati coerenti;
+  nessuna ripresa automatica dopo riavvio. Le 24 ore restano disabilitate.
+- Vista Diagnostica nativa con tile/bar-gauge e ID risolti dal registro.
+  Nessuna sovrascrittura automatica delle plance personalizzate.
+- Rapporto JSON schema 1 tramite **Scarica la diagnostica** di HA: fatti,
+  inventario cloud, dati mancanti, evidenze P1, controlli deterministici e
+  confronto manuale separati dalla verifica fisica.
+- Inventario limitato prima del parsing, alias per campi ignoti senza valori
+  grezzi, allowlist ricorsiva e consenso separato ai numeri tecnici conosciuti.
+- **11 screenshot autentici**, inclusi smartphone, tema scuro, plancia, wizard
+  e assistenza; harness e cattura ripetibili solo per sviluppo.
+- [Requisiti e compatibilità](https://github.com/ThatsNotFullAuto/MelCloudHA/blob/v0.4.0/docs/REQUISITI_E_COMPATIBILITA.md):
+  HA ≥2026.10.4, Python ≥3.14.2 nell'ambiente HA, account MELCloud Home e rete;
+  nessun hardware aggiuntivo o plugin frontend.
+
+![Collaudo diagnostico — UI reale con dati sintetici](https://raw.githubusercontent.com/ThatsNotFullAuto/MelCloudHA/v0.4.0/docs/images/diagnostics-collaudo-running.png)
+
+### Affidabilità e sicurezza
+
+- Nessun comando operativo, nuovo GET, refresh o retry Mitsubishi. I controlli
+  manuali devono essere spenti; abilitarli durante una sessione invalida e ferma
+  la raccolta con motivo esplicito, anche se reload/storage falliscono.
+- Handoff non bloccante, coda 4, elaborazione fuori dai lock del journal,
+  report 1 MiB, campioni/eventi/schema limitati, timer locale 30 secondi senza
+  scritture al tick. Circuit breaker del solo Collaudo; acquisizione ordinaria
+  e storage storico indipendenti.
+- Storage separato, atomico e verificato; report parziale recuperabile.
+  File assente/corrotto non azzera il journal. Un disco guasto può impedire
+  nuovi checkpoint; non si garantiscono dati RAM dopo crash.
+- Durate leggibili, stati tradotti, layout responsive e contatori PASS/FAIL
+  coerenti con report e checkpoint anche dopo un errore di persistenza.
+- Ordinamento ZIP esplicitamente lessicografico, per checksum riproducibili
+  anche fra Windows e Linux; regressione verificata prima e dopo la correzione.
+- Suite sintetica e frontend HA 2026.10.4/Chromium verificati. Un'ora simulata:
+  **64 GET con e senza Collaudo**, stesso journal. Zero GET aggiuntivi allo stop.
+  I job CI registrano la versione risolta: pinned/latest uguali non sono due
+  versioni HA differenti. Nessuna nuova dipendenza runtime.
+
+### Aggiornamento, primo collaudo e ripristino
+
+Fare backup protetto e verificato. In **HACS → MELCloud Diagnostics → Aggiorna**
+scegliere **v0.4.0**, quindi **riavviare Home Assistant**. Se necessario:
+**⋮ → Scarica di nuovo / Redownload → v0.4.0**. Non eliminare l'integrazione.
+Config entry, credenziali, ID entità/dispositivi, preferenze e journal storage 1
+sono preservati; le nuove entità hanno ID separati. Aggiungere la vista
+Diagnostica dal YAML generato senza sostituire la propria dashboard.
+
+Prima prova autorizzata su HA isolata, controlli manuali disabilitati:
+**Configura → Diagnostica → Collaudo diagnostico → 20 minuti**. Osservare
+reattività, risorse, normali letture e funzionamento dell'app Mitsubishi.
+**Interrompi collaudo** ferma soltanto la registrazione. Non provocare guasti
+o modificare setpoint/modalità. Al termine usare **⋮ dell'account → Scarica la
+diagnostica**; il JSON contiene `data.diagnostic_test`, anche parziale.
+Con una sessione conservata il download restituisce il report ristretto invece
+del precedente report libero; nessuno storico viene cancellato.
+Controllare privacy, date e metadati HA prima di condividere con Codex o nelle
+[issue](https://github.com/ThatsNotFullAuto/MelCloudHA/issues).
+
+La **v0.3.0 resta disponibile**. Esportare e fermare la raccolta, scegliere
+v0.3.0 in Scarica di nuovo e riavviare HA. Non eliminare config entry o journal.
+Il vecchio codice ignora lo storage separato del Collaudo. Downgrade completo
+su impianto reale non verificato: conservare un backup coerente, che riporta
+i dati alla propria data. Nessun ripristino di parametri sulla pompa.
+
+### Limiti
+
+- Primo account Mitsubishi reale, prestazioni sul target e coesistenza con
+  integrazione ufficiale/automazioni ancora da collaudare. Viewport mobile
+  verificata, non telefono fisico o tutti i browser.
+- FTC4–FTC7: modello e capacità architetturali, non diagnostica di servizio completa.
+- Causa P1 non identificata; lettura/selezione TH1A/TH1B non verificata.
+- CN105/Asgard e importazione SD non implementati; proxy MAC-597IF-E sconosciuto.
+- Nessun acquisto hardware richiesto, nessun nuovo comando verso la macchina.
+
+[Guida completa 0.4.0](https://github.com/ThatsNotFullAuto/MelCloudHA/blob/v0.4.0/docs/RELEASE_040.md) ·
+[Collaudo guidato](https://github.com/ThatsNotFullAuto/MelCloudHA/blob/v0.4.0/docs/COLLAUDO_GUIDATO.md).
+
 ## [0.3.0] - 2026-10-30
 
 **Release ordinaria del software disponibile. Nessun collaudo con account o impianto

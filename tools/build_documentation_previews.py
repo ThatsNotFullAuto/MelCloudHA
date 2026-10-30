@@ -1,7 +1,8 @@
 """Render clearly labelled illustrative UI previews, without connecting to Home Assistant.
 
 These are documentation mockups, not screenshots of an installed/tested heat pump.
-HTML stays in .tools; only the labelled PNGs are published.
+Legacy mockups stay in .tools. They must never overwrite genuine HA screenshots.
+Use capture_frontend_demo for documentation images.
 """
 
 import argparse
@@ -56,7 +57,7 @@ SUPPORT = """
 
 def main(render):
     temporary = ROOT / ".tools/docs-preview"
-    output = ROOT / "docs/images"
+    output = temporary / "illustrations"
     temporary.mkdir(parents=True, exist_ok=True)
     output.mkdir(parents=True, exist_ok=True)
     icon = base64.b64encode(

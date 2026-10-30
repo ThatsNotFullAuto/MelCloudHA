@@ -164,6 +164,33 @@ def validate_payload(kind: str, payload, acquired_at: datetime | None = None) ->
         history(payload, "history")
     elif kind == "report":
         data = payload.get("data", payload) if isinstance(payload, dict) else None
+        if isinstance(data, dict) and (
+            "diagnostic_test" in data
+            or data.get("format") == "melcloud_diagnostics.diagnostic_test"
+        ):
+            from .test_session import validate_report
+
+            try:
+                report = validate_report(data.get("diagnostic_test", data))
+            except (DataError, ValueError, KeyError, TypeError, AttributeError):
+                issue("diagnostic_test", "invalid_test_report")
+                return result
+            result["units"].append(
+                {
+                    "alias": "unit_1",
+                    "source": "melcloud_home",
+                    "evidence_scope": "exported_test_report_fields",
+                    "parameters": {
+                        key: "invalid"
+                        if counts["invalid"]
+                        else "exposed"
+                        if counts["present"]
+                        else "missing"
+                        for key, counts in report["decoded_parameters"].items()
+                    },
+                }
+            )
+            return result
         if not isinstance(data, dict) or not isinstance(data.get("support"), dict):
             issue("report", "invalid_report")
             return result

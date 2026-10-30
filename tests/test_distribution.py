@@ -121,6 +121,19 @@ async def test_future_config_schema_is_not_silently_downgraded():
     hass.config_entries.async_update_entry.assert_not_called()
 
 
+async def test_version_030_config_entry_needs_no_migration_or_data_change():
+    entry = SimpleNamespace(
+        version=1, minor_version=1,
+        data={"email": "synthetic@example.invalid", "password": "synthetic", "unit_ids": [UNIT]},
+        options={"allow_control": False},
+    )
+    hass = MagicMock()
+    before = (entry.data.copy(), entry.options.copy())
+    assert await async_migrate_entry(hass, entry)
+    hass.config_entries.async_update_entry.assert_not_called()
+    assert (entry.data, entry.options) == before
+
+
 def test_hacs_release_contract_and_readme_installation():
     hacs = json.loads(Path("hacs.json").read_text(encoding="utf-8"))
     assert hacs["zip_release"] is True

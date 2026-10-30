@@ -121,3 +121,21 @@ Il validatore [offline](VALIDAZIONE_DATI_CLOUD.md) produce una mappa dei soli
 campi esposti, mancanti o invalidi. Non stampa valori, ID, nomi o segreti e non
 contatta Mitsubishi. Non cancella o corregge file. Un errore del registro richiede
 verifica dello storage/backup, non cancellazione del file né reset della pompa.
+
+## Report del collaudo guidato — dalla 0.4.0
+
+Dopo l'avvio di una sessione, **⋮ → Scarica diagnostica** restituisce il report
+ristretto `data.diagnostic_test` al posto del report libero precedente. Config
+entry, storico e acquisizione ordinaria non vengono cancellati. Anche uno stop
+conserva il risultato; dopo crash si recupera l'ultimo checkpoint confermato.
+I numeri diagnostici richiedono consenso iniziale, i campi sconosciuti conservano
+soltanto metadati con alias. Rivedere anche metadati HA e nome file prima della
+condivisione. Nessun invio automatico. Vedi [guida](COLLAUDO_GUIDATO.md).
+
+## Report del Collaudo e frontend verificato
+
+Con una sessione conservata, **Scarica la diagnostica** restituisce il report
+ristretto del Collaudo. La categoria scelta in Assistenza e il riferimento del
+vecchio report non vengono incorporati: indicarli nel messaggio di segnalazione.
+Il download è verificato dal vero browser anche per stop ed errore storage.
+[Verifica frontend e screenshot](VERIFICA_FRONTEND_2026-10-30.md).

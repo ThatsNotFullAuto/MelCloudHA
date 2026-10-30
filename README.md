@@ -5,12 +5,18 @@
 Diagnostica per Mitsubishi Ecodan in Home Assistant, tramite **MELCloud Home**.
 Parte in **sola lettura**. Non richiede hardware aggiuntivo.
 
-**Versione 0.3.0 — release ordinaria, senza collaudo sull’impianto reale.**
+**Versione 0.4.0 — release ordinaria con Collaudo diagnostico guidato.**
+Nessun collaudo con account Mitsubishi o impianto reale ancora eseguito.
 Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
 
 ## Inizia da qui
 
-- [Aggiornare alla 0.3.0 tramite HACS e ripristinare la versione precedente](docs/RELEASE_030.md).
+- [Collaudo diagnostico guidato](docs/COLLAUDO_GUIDATO.md): sessioni da 20/60 minuti,
+  barra reale, timer, stop locale e rapporto tecnico esportabile.
+- [Requisiti e compatibilità](docs/REQUISITI_E_COMPATIBILITA.md): versioni software,
+  account, browser e stato effettivo del supporto FTC4–FTC7.
+
+- [Aggiornare alla 0.4.0 tramite HACS e ripristinare la 0.3.0](docs/RELEASE_040.md).
 
 - [Installazione HACS e prima configurazione guidata](docs/GUIDA_UTENTE.md).
 - [Plancia Ecodan: stato, temperature e guasti](docs/GUIDA_UTENTE.md#la-plancia-ecodan).
@@ -36,30 +42,59 @@ riuso, cerca eventuali candidati locali ESPHome/Asgard e ti fa scegliere le
 pompe associate all’account Mitsubishi. Non devi conoscere l’indirizzo IP.
 I candidati in rete non sono identificazioni certe della MAC-597IF-E.
 
+## Requisiti e compatibilità
+
+- **Home Assistant Core ≥2026.10.4**, Python **≥3.14.2** nell'ambiente HA.
+- **HACS** per l'installazione descritta; Internet e account **MELCloud Home**
+  con unità aria-acqua già visibile nell'app. MELCloud classico non è intercambiabile.
+- Dipendenza `aiomelcloudhome==0.3.1`, installata da HA. Nessun hardware aggiuntivo
+  o plugin frontend richiesto; per il Collaudo i controlli manuali devono essere spenti.
+- Verificato su HA 2026.10.4, Python 3.14.3 e Chromium, anche viewport smartphone.
+  FTC4–FTC7 hanno un modello testato sinteticamente, non compatibilità cloud/hardware
+  certificata. [Matrice completa e limiti](docs/REQUISITI_E_COMPATIBILITA.md).
+
 ## Cosa ottieni
 
 Temperature e impostazioni osservabili, stato operativo, codice guasto,
 storico errori quando disponibile, ricorrenze P1, report esportabili e una
 plancia nativa adatta a telefono e computer, senza schede aggiuntive.
+La 0.4.0 aggiunge sessioni guidate, verifiche automatiche dei dati e inventario
+delle informazioni mancanti. Il rapporto aiuta a ricostruire ciò che è osservabile,
+senza sostituire la diagnostica di servizio FTC o l'app Mitsubishi.
 
 Le modifiche sono **opzionali e manuali**: permesso separato, riepilogo prima/dopo,
 **due conferme**, scadenza e ricontrollo dei valori. Nessun comando dalla plancia,
 nessun reset e nessun reinvio automatico dopo un timeout. La mandata resta
 esclusa dalle scritture nella prima versione.
 
-## Anteprime
+## Screenshot dell'interfaccia
 
-**Immagini illustrative con dati fittizi**, non screenshot di un impianto.
-Descrivono le informazioni e i percorsi previsti; l’aspetto reale segue il
-tema, le schede e la versione di Home Assistant.
+**Frontend Home Assistant reale, alimentato esclusivamente da dati sintetici.**
+Catture della v0.4.0 su HA 2026.10.4. Le immagini non dimostrano
+un collaudo con account Mitsubishi o impianto reale.
 
-![Anteprima illustrativa della plancia con dati dimostrativi](docs/images/dashboard-preview.png)
+![Plancia Home Assistant con dati sintetici](docs/images/dashboard-preview.png)
 
 | Configurazione guidata | Assistenza e report |
 |---|---|
-| [![Anteprima illustrativa del wizard](docs/images/wizard-preview.png)](docs/images/wizard-preview.png) | [![Anteprima illustrativa della raccolta diagnostica](docs/images/support-preview.png)](docs/images/support-preview.png) |
+| [![Wizard reale con account demo](docs/images/wizard-preview.png)](docs/images/wizard-preview.png) | [![Assistenza nel frontend reale](docs/images/support-preview.png)](docs/images/support-preview.png) |
 
 Apri un’immagine per vederla più grande. Nessun account o dato reale è mostrato.
+
+### Collaudo diagnostico
+
+![Collaudo in esecuzione nel frontend HA con dati sintetici](docs/images/diagnostics-collaudo-running.png)
+
+| Avvio e durata | Completamento | Risultato parziale |
+|---|---|---|
+| [Avvio](docs/images/diagnostics-collaudo-start.png) | [Completato](docs/images/diagnostics-collaudo-complete.png) | [Errore di persistenza simulato](docs/images/diagnostics-collaudo-partial.png) |
+
+Disponibili anche le catture [smartphone](docs/images/diagnostics-collaudo-running-mobile.png),
+[tema scuro](docs/images/diagnostics-collaudo-running-mobile-dark.png) e
+[stop manuale](docs/images/diagnostics-collaudo-interrupted.png).
+La barra legge il sensore effettivo; il tempo è accelerato soltanto nel backend
+demo per rendere ripetibili le prove. [Procedura di rigenerazione](docs/SCREENSHOT_COLLAUDO.md)
+e [risultati della verifica frontend](docs/VERIFICA_FRONTEND_2026-10-30.md).
 
 ## Aggiornamenti
 

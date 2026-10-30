@@ -146,6 +146,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     discover()
     entry.async_on_unload(coordinator.async_add_listener(discover))
+    from .test_entities import SENSOR_DESCRIPTIONS, TestSensor
+
+    if getattr(coordinator, "test_manager", None) is not None:
+        async_add_entities(
+            [
+                TestSensor(coordinator.test_manager, entry.entry_id, description)
+                for description in SENSOR_DESCRIPTIONS
+            ]
+        )
 
 
 class DiagnosticSensor(DiagnosticEntity, SensorEntity):

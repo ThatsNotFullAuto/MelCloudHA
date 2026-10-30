@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Welcome — set up monitoring",
-        "description": "We will look for MELCloud Home accounts already configured in Home Assistant, check for recognizable local devices, and help you choose a heat pump. No IP address is needed. Nothing on the installation will be changed. Select Next to begin."
+        "description": "We will look for MELCloud Home accounts already configured in Home Assistant, check for recognizable local devices, and help you choose a heat pump. No IP address is needed. Nothing on the installation will be changed. Continue to begin."
       },
       "reauth_confirm": {
         "title": "Authenticate again",
@@ -59,7 +59,8 @@
           "settings": "Control permissions",
           "change": "Propose a setpoint change",
           "dashboard": "Prepare Ecodan dashboard",
-          "support": "Support · prepare diagnostics"
+          "support": "Support · prepare diagnostics",
+          "diagnostics": "Diagnostics"
         }
       },
       "settings": {
@@ -103,23 +104,71 @@
       },
       "dashboard": {
         "title": "Your Ecodan dashboard",
-        "description": "This configuration uses the actual entities registered in Home Assistant. It needs no custom cards and includes no controls.\n\n1. Copy the configuration below.\n2. Create and open a new empty dashboard in Settings → Dashboards.\n3. Open Edit dashboard → ⋮ → Raw configuration editor.\n4. Paste and save. Use a new dashboard: the editor content will be replaced.\n\n```yaml\n{yaml}\n```\n\nThe button below closes this guide. It does not install a dashboard automatically."
+        "description": "This configuration uses the actual entities registered in Home Assistant. It needs no custom cards and includes only sensors and a local collection stop button. It sends no operational commands to the heat pump.\n\n1. Copy the configuration below.\n2. Create and open a new empty dashboard in Settings → Dashboards.\n3. Open Edit dashboard → ⋮ → Raw configuration editor.\n4. Paste and save. Use a new dashboard: the editor content will be replaced.\n\n```yaml\n{yaml}\n```\n\nThe button below closes this guide. It does not install a dashboard automatically."
       },
       "support": {
         "title": "Prepare diagnostics for support",
-        "description": "Choose the issue you are seeing. The report includes software versions, acquisition health and recent communication errors. No technical knowledge or heat pump setting changes are needed. Debug logging is not required for an initial report.",
+        "description": "Choose the issue you are seeing. The report includes software versions and acquisition health. If a Diagnostic Test session exists, the download returns its restricted report: include the issue category in your accompanying message. No technical knowledge or heat pump setting changes are needed. Debug logging is not required for an initial report.",
         "data": {
           "category": "Which issue would you like to report?"
         }
       },
       "support_ready": {
         "title": "Report ready to download",
-        "description": "Report reference: **{reference}**.\n\n1. Select Finish to close this window.\n2. In the ⋮ menu next to your MELCloud Diagnostics account, select **Download diagnostics**.\n3. Keep the JSON file unchanged and attach it to your support request. Explain what failed and when.\n\nThe file includes versions, the selected issue category, acquisition status and available operational data. It excludes account passwords and tokens, but contains installation timestamps and temperatures. Review it before publishing.\n\nIf detailed logs are needed, enable debug logging, reproduce only the problematic operation, then disable debug logging to download the log. Do not change heat pump settings to collect a report."
+        "description": "Report reference: **{reference}**.\n\n1. Select Finish to close this window.\n2. In the ⋮ menu next to your MELCloud Diagnostics account, select **Download diagnostics**.\n3. Keep the JSON file unchanged and attach it to your support request. Explain what failed and when.\n\nThe file includes versions, the selected issue category, acquisition status and available operational data. It excludes account passwords and tokens, but contains installation timestamps and temperatures. Review it before publishing.\n\nIf detailed logs are needed, enable debug logging, reproduce only the problematic operation, then disable debug logging to download the log. Do not change heat pump settings to collect a report.\n\nIf a Diagnostic Test session is stored, Download diagnostics returns its restricted report instead. The issue category and this support reference are not included: mention them separately."
+      },
+      "diagnostics": {
+        "title": "Diagnostics",
+        "menu_options": {
+          "test_setup": "Collaudo diagnostico",
+          "test_status": "Stato del collaudo",
+          "test_compare": "Confronto manuale",
+          "test_export": "Esporta il report"
+        }
+      },
+      "test_setup": {
+        "title": "Collaudo diagnostico",
+        "description": "Scegli la pompa e la durata. Il collaudo osserva solo le letture ordinarie: nessuna richiesta aggiuntiva, nessun cambio di setpoint o modalità, nessun errore provocato. Puoi continuare a usare MELCloud Home. La chiusura di questa finestra non interrompe la raccolta. I parametri interni FTC possono restare sconosciuti. Le 24 ore non sono ancora disponibili. Per sicurezza i controlli manuali devono essere disabilitati.\n\nIl report standard contiene metadati, codici e stati consentiti. Autorizzando i valori tecnici include anche temperature, setpoint e RSSI limitati ai campi conosciuti. Non include payload grezzi o valori sconosciuti. Un solo report è conservato: scarica quello precedente prima di sostituirlo.",
+        "data": {
+          "unit_id": "Pompa da osservare",
+          "duration": "Durata",
+          "export_values": "Autorizzo temperature, setpoint e RSSI conosciuti nel report tecnico",
+          "replace_previous": "Ho conservato il report precedente e ne autorizzo la sostituzione"
+        }
+      },
+      "test_status": {
+        "title": "Stato del collaudo",
+        "description": "Stato: **{status}** · Avanzamento temporale: **{progress}%**\n\nDurata: {duration} minuti · Trascorsi: {elapsed} minuti · Residui: {remaining} minuti.\n\nLetture riuscite: {successful} · Fallite: {failed}. Storico: {history}. Persistenza: {storage}. Cloud: {cloud}. Ultima lettura UTC: {last_acquisition}.\n\nOsservazioni perse: {dropped}. Motivo di arresto: {reason}. Controlli finali: PASS {passed}, FAIL {failed_checks}, non verificabili {unverifiable}. Prima del termine i conteggi dei controlli non sono valutati.\n\nQuesta schermata fotografa lo stato corrente: usa Aggiorna per rileggerlo senza richieste cloud. Per la barra e i timer aggiornati automaticamente apri il dispositivo Collaudo diagnostico o la vista Diagnostica della plancia generata. Si aggiornano localmente ogni 30 secondi. Il 100% misura il tempo, non conferma la salute della pompa. Puoi chiudere la finestra: la raccolta continua.",
+        "menu_options": {
+          "test_status": "Aggiorna stato (solo locale)",
+          "test_stop": "Interrompi solo il collaudo",
+          "test_compare": "Confronto manuale dopo lo stop",
+          "test_export": "Come scaricare il report"
+        }
+      },
+      "test_compare": {
+        "title": "Confronto manuale facoltativo",
+        "description": "Dopo il termine confronta le letture già visibili in HA con MELCloud Home, considerando orari, aria/acqua e ritardi. Non cambiare alcuna impostazione. Questa dichiarazione è manuale: non diventa una verifica fisica automatica.",
+        "data": {
+          "comparison": "Esito del confronto"
+        }
+      },
+      "test_export": {
+        "title": "Scarica il rapporto di collaudo",
+        "description": "Chiudi questa finestra. Nel menu ⋮ dell'account MELCloud Diagnostics scegli **Scarica la diagnostica**. Il JSON conterrà il rapporto di collaudo, anche parziale. Rimane disponibile dopo la chiusura del browser e il reload. Non servono terminale o credenziali aggiuntive. Controlla date e dati tecnici prima di condividere il file con chi sviluppa. Nessun invio automatico. Non allegare backup o credenziali."
       }
     },
     "error": {
       "proposal_failed": "Proposal rejected. See details above; no command sent.",
-      "select_parameter": "Choose a heat pump and one of the listed temperatures."
+      "select_parameter": "Choose a heat pump and one of the listed temperatures.",
+      "test_controls_enabled": "Avvio rifiutato: disabilita prima le modifiche manuali nei permessi di controllo. Nessuna opzione è stata cambiata automaticamente.",
+      "test_already_running": "Esiste già un collaudo in corso.",
+      "test_storage_error": "Storage del collaudo non disponibile. Il monitoraggio ordinario continua; conserva il report e verifica il backup.",
+      "test_replace_required": "Scarica il report precedente e conferma esplicitamente la sua sostituzione.",
+      "test_invalid_duration": "Scegli 20 o 60 minuti.",
+      "test_invalid_unit": "Scegli una pompa già configurata.",
+      "test_not_started": "Nessun rapporto disponibile.",
+      "test_compare_after_stop": "Esegui il confronto dopo il completamento o lo stop del collaudo."
     },
     "abort": {
       "control_disabled": "Read-only mode: enable manual changes in Control permissions first.",
@@ -130,7 +179,9 @@
       "parameter_unavailable": "This temperature cannot currently be changed. The unit may be offline or in error, Mitsubishi may not provide its limits, or the zone may use flow temperature control. Monitoring remains available. Check MELCloud Home or the controller; do not change system configuration just to unlock this procedure.",
       "entities_not_ready": "Entities are not ready. Wait a minute, check the device has appeared, and open Prepare Ecodan dashboard again.",
       "invalid_support_category": "Choose one of the listed issue categories.",
-      "support_not_loaded": "The integration is not loaded. Use its menu to enable debug logging, retry startup, then disable debug logging to download the log. Do not delete the configuration."
+      "support_not_loaded": "The integration is not loaded. Use its menu to enable debug logging, retry startup, then disable debug logging to download the log. Do not delete the configuration.",
+      "test_not_loaded": "Il collaudo non è caricato. Il monitoraggio ordinario non viene modificato.",
+      "test_report_ready": "Usa Scarica diagnostica nel menu dell’integrazione per ottenere il rapporto."
     }
   },
   "entity": {
@@ -165,6 +216,61 @@
           "unavailable": "Temporarily unavailable",
           "unsupported": "Not accessible for this installation/account",
           "unknown": "Not checked yet"
+        }
+      },
+      "test_status": {
+        "state": {
+          "non_avviato": "Non avviato",
+          "in_esecuzione": "Acquisizione in corso",
+          "completato": "Completato",
+          "parziale": "Parziale",
+          "interrotto": "Interrotto",
+          "fallito": "Fallito"
+        }
+      },
+      "test_quality": {
+        "state": {
+          "inconcludente": "Informazioni insufficienti",
+          "parziale": "Raccolta parziale",
+          "raccolta_strutturale": "Formati interpretabili"
+        }
+      },
+      "test_reason": {
+        "state": {
+          "deadline": "Durata conclusa",
+          "user": "Interrotto dall’utente",
+          "reload_or_restart": "Reload o riavvio di HA",
+          "shutdown": "Arresto di HA",
+          "queue_full": "Coda di raccolta satura",
+          "capacity": "Limite di raccolta raggiunto",
+          "storage_error": "Errore di salvataggio",
+          "processing_error": "Errore di elaborazione",
+          "rate_limited": "Limite richieste cloud (429)",
+          "reauth_required": "Nuova autenticazione necessaria",
+          "repeated_errors": "Errori ripetuti",
+          "control_permissions_changed": "Permessi di controllo modificati"
+        }
+      },
+      "test_cloud": {
+        "state": {
+          "unknown": "Non verificata",
+          "operativa": "Operativa",
+          "unavailable": "Non disponibile"
+        }
+      },
+      "test_storage": {
+        "state": {
+          "regular": "Regolare",
+          "pending": "Salvataggio in corso",
+          "error": "Errore di salvataggio"
+        }
+      },
+      "test_history": {
+        "state": {
+          "available": "Disponibile",
+          "unavailable": "Non disponibile",
+          "unsupported": "Non accessibile",
+          "unknown": "Non verificato"
         }
       }
     }

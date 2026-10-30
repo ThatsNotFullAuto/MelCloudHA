@@ -239,3 +239,32 @@ impedisce l'invio e non riprende automaticamente il comando.
 
 Vedi [rapporto affidabilità](AFFIDABILITA_E_COLLAUDO.md),
 [verifica offline](VALIDAZIONE_DATI_CLOUD.md) e [collaudo](COLLAUDO_MELCLOUD_HOME.md).
+
+## Versione 0.4.0: sessione di collaudo isolata
+
+Aggiunta nella 0.4.0. `test_manager.py` osserva il normale
+coordinator senza client cloud, writer o gate. Il callback pre-parser produce
+metadati limitati; la consegna post-poll usa `put_nowait` su coda 4. Riduzione,
+validazione, esportazione e persistenza del report lavorano fuori dai lock del
+journal, in executor HA. Il journal principale conserva schema/chiave e ID.
+
+`core/test_privacy.py` applica allowlist/alias di sessione; `core/test_session.py`
+definisce report e controlli deterministici. `test_entities.py` e `button.py`
+espongono solo stato/timer e stop locale. Storage separato HA 1/report 1, 1 MiB,
+75 campioni, 128 eventi/guasti/percorsi; durate 20/60 minuti. Tick 30 s senza I/O
+o GET. Corruzione, timeout e circuit breaker sono locali al collaudo.
+
+Dettagli, compromessi di persistenza e limiti verificati nella
+[guida di isolamento e collaudo](COLLAUDO_GUIDATO.md). Nessun nuovo requisito
+Python, endpoint Mitsubishi, controllo termico o trasporto CN105.
+
+## Verifica del frontend locale
+
+HA Core 2026.10.4 e il suo frontend sono stati eseguiti in Linux con trasporto
+sintetico, senza alterare il codice HA. Verificati flow, tile/bar-gauge, timer,
+stop, download autenticato, reload e interruzione per permessi di controllo.
+Le durate dei sensori sono in minuti; il report conserva secondi. I controlli
+persistiti, visualizzati ed esportati condividono la stessa funzione di
+valutazione, inclusi errori storage. Nove regressioni aggiunte, 220 test totali.
+[Rapporto frontend](VERIFICA_FRONTEND_2026-10-30.md). Nessuna verifica fisica
+dell'impianto o benchmark sul sistema domestico.

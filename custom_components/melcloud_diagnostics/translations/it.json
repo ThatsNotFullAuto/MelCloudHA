@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Benvenuto — configura il monitoraggio",
-        "description": "Ti aiuteremo a trovare un account MELCloud Home già presente in Home Assistant e a scegliere la pompa di calore. Cercheremo anche eventuali dispositivi locali riconoscibili. Non servono indirizzi IP e non cambieremo impostazioni della macchina. Premi Avanti per iniziare."
+        "description": "Ti aiuteremo a trovare un account MELCloud Home già presente in Home Assistant e a scegliere la pompa di calore. Cercheremo anche eventuali dispositivi locali riconoscibili. Non servono indirizzi IP e non cambieremo impostazioni della macchina. Prosegui per iniziare."
       },
       "reauth_confirm": {
         "title": "Nuova autenticazione",
@@ -59,7 +59,8 @@
           "settings": "Permessi di controllo",
           "change": "Proponi modifica setpoint",
           "dashboard": "Prepara la plancia Ecodan",
-          "support": "Assistenza · prepara diagnostica"
+          "support": "Assistenza · prepara diagnostica",
+          "diagnostics": "Diagnostica"
         }
       },
       "settings": {
@@ -103,23 +104,71 @@
       },
       "dashboard": {
         "title": "La tua plancia Ecodan",
-        "description": "Questa configurazione usa i sensori effettivamente presenti in Home Assistant. Non richiede schede personalizzate e non contiene comandi.\n\n1. Copia il testo del riquadro.\n2. Crea una nuova plancia vuota da Impostazioni → Plance e aprila.\n3. Apri Modifica plancia → menu ⋮ → Editor di configurazione grezza.\n4. Incolla il testo e salva. Usa una plancia nuova, perché sostituirà il contenuto dell’editor.\n\n```yaml\n{yaml}\n```\n\nIl pulsante qui sotto chiude questa guida: la plancia non viene installata automaticamente."
+        "description": "Questa configurazione usa le entità effettivamente presenti in Home Assistant. Non richiede schede personalizzate. Contiene sensori e un pulsante locale che interrompe soltanto il collaudo, senza comandi operativi alla pompa.\n\n1. Copia il testo del riquadro.\n2. Crea una nuova plancia vuota da Impostazioni → Plance e aprila.\n3. Apri Modifica plancia → menu ⋮ → Editor di configurazione grezza.\n4. Incolla il testo e salva. Usa una plancia nuova, perché sostituirà il contenuto dell’editor.\n\n```yaml\n{yaml}\n```\n\nIl pulsante qui sotto chiude questa guida: la plancia non viene installata automaticamente."
       },
       "support": {
         "title": "Prepara la diagnostica per l’assistenza",
-        "description": "Scegli il problema che stai riscontrando. Prepareremo un report tecnico con versioni, stato delle letture e ultimi errori di comunicazione. Non servono conoscenze tecniche e non devi modificare alcuna impostazione della pompa. Per il primo report non occorre attivare il debug.",
+        "description": "Scegli il problema che stai riscontrando. Prepareremo un report tecnico con versioni e stato delle letture. Se esiste una sessione di Collaudo, il download restituisce il suo report ristretto: indica la categoria del problema nel messaggio di accompagnamento. Non servono conoscenze tecniche e non devi modificare alcuna impostazione della pompa. Per il primo report non occorre attivare il debug.",
         "data": {
           "category": "Quale problema vuoi segnalare?"
         }
       },
       "support_ready": {
         "title": "Report pronto da scaricare",
-        "description": "Riferimento del report: **{reference}**.\n\n1. Premi Fine per chiudere questa finestra.\n2. Nel menu ⋮ accanto all’account MELCloud Diagnostics scegli **Scarica diagnostica**.\n3. Conserva il file JSON senza modificarlo. Allegalo alla segnalazione al creatore dell’integrazione, indicando cosa non funziona e l’orario del problema.\n\nIl file contiene già versioni software, categoria scelta, stato delle acquisizioni e dati tecnici disponibili. Non contiene password o token dell’account; contiene date e temperature dell’impianto. Controllalo prima di pubblicarlo.\n\nSe serviranno anche i log dettagliati, usa Abilita registrazione debug, ripeti solo l’operazione problematica e poi Disabilita registrazione debug per scaricarli. Non cambiare temperature per raccogliere la diagnostica."
+        "description": "Riferimento del report: **{reference}**.\n\n1. Premi Fine per chiudere questa finestra.\n2. Nel menu ⋮ accanto all’account MELCloud Diagnostics scegli **Scarica diagnostica**.\n3. Conserva il file JSON senza modificarlo. Allegalo alla segnalazione al creatore dell’integrazione, indicando cosa non funziona e l’orario del problema.\n\nIl file contiene già versioni software, categoria scelta, stato delle acquisizioni e dati tecnici disponibili. Non contiene password o token dell’account; contiene date e temperature dell’impianto. Controllalo prima di pubblicarlo.\n\nSe serviranno anche i log dettagliati, usa Abilita registrazione debug, ripeti solo l’operazione problematica e poi Disabilita registrazione debug per scaricarli. Non cambiare temperature per raccogliere la diagnostica.\n\nSe esiste una sessione di Collaudo, Scarica la diagnostica restituisce invece il suo report ristretto. Categoria del problema e questo riferimento assistenza non sono inclusi: indicarli nel messaggio separato."
+      },
+      "diagnostics": {
+        "title": "Diagnostica",
+        "menu_options": {
+          "test_setup": "Collaudo diagnostico",
+          "test_status": "Stato del collaudo",
+          "test_compare": "Confronto manuale",
+          "test_export": "Esporta il report"
+        }
+      },
+      "test_setup": {
+        "title": "Collaudo diagnostico",
+        "description": "Scegli la pompa e la durata. Il collaudo osserva solo le letture ordinarie: nessuna richiesta aggiuntiva, nessun cambio di setpoint o modalità, nessun errore provocato. Puoi continuare a usare MELCloud Home. La chiusura di questa finestra non interrompe la raccolta. I parametri interni FTC possono restare sconosciuti. Le 24 ore non sono ancora disponibili. Per sicurezza i controlli manuali devono essere disabilitati.\n\nIl report standard contiene metadati, codici e stati consentiti. Autorizzando i valori tecnici include anche temperature, setpoint e RSSI limitati ai campi conosciuti. Non include payload grezzi o valori sconosciuti. Un solo report è conservato: scarica quello precedente prima di sostituirlo.",
+        "data": {
+          "unit_id": "Pompa da osservare",
+          "duration": "Durata",
+          "export_values": "Autorizzo temperature, setpoint e RSSI conosciuti nel report tecnico",
+          "replace_previous": "Ho conservato il report precedente e ne autorizzo la sostituzione"
+        }
+      },
+      "test_status": {
+        "title": "Stato del collaudo",
+        "description": "Stato: **{status}** · Avanzamento temporale: **{progress}%**\n\nDurata: {duration} minuti · Trascorsi: {elapsed} minuti · Residui: {remaining} minuti.\n\nLetture riuscite: {successful} · Fallite: {failed}. Storico: {history}. Persistenza: {storage}. Cloud: {cloud}. Ultima lettura UTC: {last_acquisition}.\n\nOsservazioni perse: {dropped}. Motivo di arresto: {reason}. Controlli finali: PASS {passed}, FAIL {failed_checks}, non verificabili {unverifiable}. Prima del termine i conteggi dei controlli non sono valutati.\n\nQuesta schermata fotografa lo stato corrente: usa Aggiorna per rileggerlo senza richieste cloud. Per la barra e i timer aggiornati automaticamente apri il dispositivo Collaudo diagnostico o la vista Diagnostica della plancia generata. Si aggiornano localmente ogni 30 secondi. Il 100% misura il tempo, non conferma la salute della pompa. Puoi chiudere la finestra: la raccolta continua.",
+        "menu_options": {
+          "test_status": "Aggiorna stato (solo locale)",
+          "test_stop": "Interrompi solo il collaudo",
+          "test_compare": "Confronto manuale dopo lo stop",
+          "test_export": "Come scaricare il report"
+        }
+      },
+      "test_compare": {
+        "title": "Confronto manuale facoltativo",
+        "description": "Dopo il termine confronta le letture già visibili in HA con MELCloud Home, considerando orari, aria/acqua e ritardi. Non cambiare alcuna impostazione. Questa dichiarazione è manuale: non diventa una verifica fisica automatica.",
+        "data": {
+          "comparison": "Esito del confronto"
+        }
+      },
+      "test_export": {
+        "title": "Scarica il rapporto di collaudo",
+        "description": "Chiudi questa finestra. Nel menu ⋮ dell'account MELCloud Diagnostics scegli **Scarica la diagnostica**. Il JSON conterrà il rapporto di collaudo, anche parziale. Rimane disponibile dopo la chiusura del browser e il reload. Non servono terminale o credenziali aggiuntive. Controlla date e dati tecnici prima di condividere il file con chi sviluppa. Nessun invio automatico. Non allegare backup o credenziali."
       }
     },
     "error": {
       "proposal_failed": "Proposta rifiutata. Consulta il dettaglio sopra; nessun comando inviato.",
-      "select_parameter": "Scegli una pompa e una delle temperature elencate."
+      "select_parameter": "Scegli una pompa e una delle temperature elencate.",
+      "test_controls_enabled": "Avvio rifiutato: disabilita prima le modifiche manuali nei permessi di controllo. Nessuna opzione è stata cambiata automaticamente.",
+      "test_already_running": "Esiste già un collaudo in corso.",
+      "test_storage_error": "Storage del collaudo non disponibile. Il monitoraggio ordinario continua; conserva il report e verifica il backup.",
+      "test_replace_required": "Scarica il report precedente e conferma esplicitamente la sua sostituzione.",
+      "test_invalid_duration": "Scegli 20 o 60 minuti.",
+      "test_invalid_unit": "Scegli una pompa già configurata.",
+      "test_not_started": "Nessun rapporto disponibile.",
+      "test_compare_after_stop": "Esegui il confronto dopo il completamento o lo stop del collaudo."
     },
     "abort": {
       "control_disabled": "Modalità sola lettura: abilita prima le modifiche manuali nei permessi di controllo.",
@@ -130,7 +179,9 @@
       "parameter_unavailable": "Questa temperatura non può essere modificata nelle condizioni attuali. Può dipendere dalla connessione, da un guasto, da limiti non forniti da Mitsubishi oppure dalla regolazione in mandata. Il monitoraggio resta disponibile: usa l’app o il display per verificare la configurazione, senza cambiarla per sbloccare questa procedura.",
       "entities_not_ready": "I sensori non sono ancora pronti. Attendi un minuto, verifica che il dispositivo sia comparso e riapri Prepara la plancia Ecodan.",
       "invalid_support_category": "Scegli uno dei problemi elencati.",
-      "support_not_loaded": "L’integrazione non è caricata. Dal suo menu abilita la registrazione debug, riprova l’avvio e disabilitala per scaricare il log. Non eliminare la configurazione."
+      "support_not_loaded": "L’integrazione non è caricata. Dal suo menu abilita la registrazione debug, riprova l’avvio e disabilitala per scaricare il log. Non eliminare la configurazione.",
+      "test_not_loaded": "Il collaudo non è caricato. Il monitoraggio ordinario non viene modificato.",
+      "test_report_ready": "Usa Scarica diagnostica nel menu dell’integrazione per ottenere il rapporto."
     }
   },
   "entity": {
@@ -165,6 +216,61 @@
           "unavailable": "Temporaneamente non disponibile",
           "unsupported": "Non accessibile per questo impianto/account",
           "unknown": "Non ancora verificato"
+        }
+      },
+      "test_status": {
+        "state": {
+          "non_avviato": "Non avviato",
+          "in_esecuzione": "Acquisizione in corso",
+          "completato": "Completato",
+          "parziale": "Parziale",
+          "interrotto": "Interrotto",
+          "fallito": "Fallito"
+        }
+      },
+      "test_quality": {
+        "state": {
+          "inconcludente": "Informazioni insufficienti",
+          "parziale": "Raccolta parziale",
+          "raccolta_strutturale": "Formati interpretabili"
+        }
+      },
+      "test_reason": {
+        "state": {
+          "deadline": "Durata conclusa",
+          "user": "Interrotto dall’utente",
+          "reload_or_restart": "Reload o riavvio di HA",
+          "shutdown": "Arresto di HA",
+          "queue_full": "Coda di raccolta satura",
+          "capacity": "Limite di raccolta raggiunto",
+          "storage_error": "Errore di salvataggio",
+          "processing_error": "Errore di elaborazione",
+          "rate_limited": "Limite richieste cloud (429)",
+          "reauth_required": "Nuova autenticazione necessaria",
+          "repeated_errors": "Errori ripetuti",
+          "control_permissions_changed": "Permessi di controllo modificati"
+        }
+      },
+      "test_cloud": {
+        "state": {
+          "unknown": "Non verificata",
+          "operativa": "Operativa",
+          "unavailable": "Non disponibile"
+        }
+      },
+      "test_storage": {
+        "state": {
+          "regular": "Regolare",
+          "pending": "Salvataggio in corso",
+          "error": "Errore di salvataggio"
+        }
+      },
+      "test_history": {
+        "state": {
+          "available": "Disponibile",
+          "unavailable": "Non disponibile",
+          "unsupported": "Non accessibile",
+          "unknown": "Non verificato"
         }
       }
     }

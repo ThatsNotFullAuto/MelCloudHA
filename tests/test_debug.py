@@ -81,7 +81,7 @@ async def test_report_has_versions_transport_health_and_allowlisted_snapshot(raw
         data={"email": "private-synthetic@example.com", "password": "synthetic-secret"},
     )
     data = await async_get_config_entry_diagnostics(None, entry)
-    assert data["versions"]["integration"] == "0.3.0"
+    assert data["versions"]["integration"] == "0.4.0"
     assert data["last_successful_poll"] == NOW.isoformat()
     assert data["transport_health"]["counters"]["unit_snapshot:success"] == 1
     assert (
