@@ -207,3 +207,9 @@ def test_release_image_links_are_pinned_to_its_tag_and_present(packages):
     for link in links:
         assert link.startswith(prefix)
         assert (ROOT / link.removeprefix(prefix)).is_file()
+
+
+def test_source_archive_documentation_order_is_lexical_on_all_platforms(packages):
+    with zipfile.ZipFile(packages / "melcloud-diagnostics-0.4.0.zip") as archive:
+        paths = [name for name in archive.namelist() if name.startswith("docs/")]
+        assert paths == sorted(paths)

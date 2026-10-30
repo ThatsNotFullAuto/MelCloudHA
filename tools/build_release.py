@@ -29,7 +29,7 @@ version = json.loads((component / "manifest.json").read_text(encoding="utf-8"))[
 output = args.output_dir / f"melcloud-diagnostics-{version}.zip"
 output.parent.mkdir(parents=True, exist_ok=True)
 with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
-    for path in sorted(component.rglob("*")):
+    for path in sorted(component.rglob("*"), key=lambda path: path.as_posix()):
         if (
             path.is_file()
             and "__pycache__" not in path.parts
@@ -38,7 +38,7 @@ with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
             add_file(archive, path, path.relative_to(root).as_posix())
     add_file(archive, root / "README.md", "README.md")
     add_file(archive, root / "LICENSE", "LICENSE")
-    for path in sorted((root / "docs").rglob("*")):
+    for path in sorted((root / "docs").rglob("*"), key=lambda path: path.as_posix()):
         if path.is_file() and path.suffix in (".md", ".png"):
             add_file(archive, path, path.relative_to(root).as_posix())
 with output.open("rb") as source:
@@ -50,7 +50,7 @@ print(f"{output}\nSHA256 {digest}")
 # It must NOT contain the custom_components/domain prefix.
 hacs_output = output.parent / "melcloud_diagnostics.zip"
 with zipfile.ZipFile(hacs_output, "w", zipfile.ZIP_DEFLATED) as archive:
-    for path in sorted(component.rglob("*")):
+    for path in sorted(component.rglob("*"), key=lambda path: path.as_posix()):
         if (
             path.is_file()
             and "__pycache__" not in path.parts

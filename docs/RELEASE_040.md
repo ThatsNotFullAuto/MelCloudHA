@@ -45,6 +45,9 @@ Il journal principale e le normali entità restano indipendenti. La simulazione
 di un'ora ha prodotto 64 GET con e senza Collaudo; non è un benchmark sul sistema
 domestico. La durata di 24 ore resta disabilitata.
 
+I pacchetti usano un ordinamento esplicito dei percorsi: contenuti e checksum
+sono riproducibili anche fra Windows e Linux.
+
 Il report schema 1 separa fatti, interpretazione e verifiche; inventaria dati
 assenti, non interpretati e formati inattesi. I campi sconosciuti hanno alias e
 metadati limitati, senza valori grezzi. Temperature, setpoint e RSSI conosciuti

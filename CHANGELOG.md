@@ -41,6 +41,8 @@
   nuovi checkpoint; non si garantiscono dati RAM dopo crash.
 - Durate leggibili, stati tradotti, layout responsive e contatori PASS/FAIL
   coerenti con report e checkpoint anche dopo un errore di persistenza.
+- Ordinamento ZIP esplicitamente lessicografico, per checksum riproducibili
+  anche fra Windows e Linux; regressione verificata prima e dopo la correzione.
 - Suite sintetica e frontend HA 2026.10.4/Chromium verificati. Un'ora simulata:
   **64 GET con e senza Collaudo**, stesso journal. Zero GET aggiuntivi allo stop.
   I job CI registrano la versione risolta: pinned/latest uguali non sono due
