@@ -1,8 +1,11 @@
 """Persistent diagnostic history, deduplication and observed transitions."""
 
+import hashlib
+import json
+from copy import deepcopy
 from datetime import timedelta
 
-from .models import Fault, Snapshot
+from .models import ZONE_MODES, DataError, Fault, Snapshot, error_code, number, timestamp
 
 WATCHED = (
     "OperationModeZone1",
@@ -30,7 +33,60 @@ class Journal:
     """Store upstream facts separately from software-generated observations."""
 
     def __init__(self, data=None):
-        self.data = data or {"units": {}, "commands": []}
+        if data is None:
+            data = {"units": {}, "commands": []}
+        if (
+            not isinstance(data, dict)
+            or not isinstance(data.get("units"), dict)
+            or not isinstance(data.get("commands"), list)
+            or any(not isinstance(record, dict) for record in data["commands"])
+        ):
+            raise DataError("Invalid diagnostic journal")
+        for saved in data["units"].values():
+            if (
+                not isinstance(saved, dict)
+                or not isinstance(saved.get("faults"), dict)
+                or not isinstance(saved.get("observations"), list)
+                or any(not isinstance(item, dict) for item in saved["observations"])
+                or not isinstance(saved.get("previous"), (dict, type(None)))
+                or not isinstance(saved.get("history_initialized"), bool)
+            ):
+                raise DataError("Invalid stored unit")
+            for fault in saved["faults"].values():
+                Fault.parse(fault)
+            if saved.get("previous_observed_at"):
+                timestamp(saved["previous_observed_at"])
+        self.data = deepcopy(data)
+
+    @staticmethod
+    def _settings(settings):
+        current = {}
+        for key in OBSERVED:
+            value = settings.get(key)
+            if key.startswith("OperationModeZone"):
+                valid = isinstance(value, str) and value in ZONE_MODES
+            elif key == "ErrorCode":
+                value = error_code(value)
+                valid = value is not None
+            elif key == "OperationMode":
+                valid = isinstance(value, str) and value.lower() not in (
+                    "",
+                    "unknown",
+                    "unavailable",
+                )
+            else:
+                valid = number(value) is not None
+            if valid:
+                current[key] = value
+        return current
+
+    def _append(self, unit, events):
+        for event in events:
+            event["event_id"] = hashlib.sha256(
+                json.dumps(event, sort_keys=True, ensure_ascii=True).encode()
+            ).hexdigest()
+        unit["observations"].extend(deepcopy(events))
+        unit["observations"] = unit["observations"][-1000:]
 
     def unit(self, identifier):
         return self.data["units"].setdefault(
@@ -45,20 +101,33 @@ class Journal:
 
     def observe(self, snapshot: Snapshot) -> list[dict]:
         unit = self.unit(snapshot.id)
-        current = {k: snapshot.settings[k] for k in OBSERVED if k in snapshot.settings}
+        if unit.get("previous_observed_at") and snapshot.observed_at < timestamp(
+            unit["previous_observed_at"]
+        ):
+            return []
+        current = self._settings(snapshot.settings)
         current["is_in_error"] = snapshot.in_error
         previous = unit["previous"]
         events = []
         if snapshot.in_error is True and (
             previous is None
             or previous.get("is_in_error") is not True
-            or previous.get("ErrorCode") != current.get("ErrorCode")
+            or (
+                "ErrorCode" in current
+                and error_code(previous.get("ErrorCode")) != current["ErrorCode"]
+            )
         ):
             events.append({"type": "active_fault", "code": current.get("ErrorCode")})
         if previous is not None:
+            previous_settings = self._settings(previous)
             for key in WATCHED:
                 # Missing data does not count as a real change.
-                if key in current and key in previous and current[key] != previous[key]:
+                if key not in current or key not in previous_settings:
+                    continue
+                old, new = previous_settings[key], current[key]
+                if not key.startswith("OperationMode"):
+                    old, new = number(old), number(new)
+                if old != new:
                     events.append(
                         {
                             "type": "setting_changed",
@@ -76,17 +145,23 @@ class Journal:
                     "snapshot": current.copy(),
                 }
             )
-        unit["observations"].extend(events)
-        unit["observations"] = unit["observations"][-1000:]
+        self._append(unit, events)
         # Keep last known values across temporarily missing fields, but don't invent new ones.
-        unit["previous"] = {**(previous or {}), **current}
+        unit["previous"] = {
+            **(previous or {}),
+            **{k: v for k, v in current.items() if v is not None},
+        }
+        unit["previous_observed_at"] = snapshot.observed_at.isoformat()
         return events
 
-    def merge_faults(self, identifier: str, faults: list[Fault]) -> list[dict]:
+    def merge_faults(self, identifier: str, faults: list[Fault], observed_at=None) -> list[dict]:
         unit = self.unit(identifier)
         events = []
+        # Preserve legacy dictionary keys while comparing canonical fault identity.
+        keys = {Fault.parse(value).key: key for key, value in unit["faults"].items()}
         for fault in faults:
-            if fault.key not in unit["faults"] and unit["history_initialized"]:
+            stored_key = keys.get(fault.key, fault.key)
+            if fault.key not in keys and unit["history_initialized"]:
                 events.append(
                     {
                         "type": "cloud_fault_added",
@@ -97,11 +172,16 @@ class Journal:
                 )
             # Do not lose a previously known cleared time if upstream temporarily omits it.
             record = fault.serialize()
-            old = unit["faults"].get(fault.key)
+            old = unit["faults"].get(stored_key)
             if old and old.get("clearedTimestamp") and not record["clearedTimestamp"]:
                 record["clearedTimestamp"] = old["clearedTimestamp"]
-            unit["faults"][fault.key] = record
+            unit["faults"][stored_key] = record
+            keys[fault.key] = stored_key
         unit["history_initialized"] = True
+        if observed_at is not None:
+            for event in events:
+                event["observed_at"] = observed_at.isoformat()
+            self._append(unit, events)
         return events
 
     def faults(self, identifier):

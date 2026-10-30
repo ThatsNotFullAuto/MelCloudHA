@@ -1,5 +1,93 @@
 # Changelog
 
+## [0.3.0] - 2026-10-30
+
+**Release ordinaria del software disponibile. Nessun collaudo con account o impianto
+Mitsubishi reale è stato eseguito. La 0.2.1 resta disponibile come versione precedente.**
+
+### Aggiunto
+
+- Fondamenta multi-sorgente FTC4–FTC7: osservazioni normalizzate con provenienza,
+  disponibilità, validazione e timestamp separati.
+- Registry delle capacità con evidenze e contesto; ciò che non è verificato
+  resta unknown. Contratti astratti per sorgenti future, senza driver operativi.
+- Report diagnostico con fatti normalizzati e stato della persistenza;
+  validatore offline che non stampa valori o identificativi.
+- Procedura di collaudo cloud sicuro, backup e ripristino.
+
+### Migliorato
+
+- Consolidamento persistenza: scritture HA atomiche con rilettura di conferma;
+  file corrotti o scomparsi durante l'esecuzione non vengono reinizializzati.
+- Commit del journal isolati dallo stato pubblicato, conservati in attesa dopo
+  errori/timeout e ritentati prima di nuove acquisizioni. Cancellazioni durante
+  la scrittura attendono l'esito; uno storico interrotto conserva gli snapshot
+  già acquisiti. Nessun replay delle notifiche al riavvio.
+- Eventi diagnostici con `event_id`; nuove notifiche storiche conservate anche
+  nelle osservazioni con timestamp distinto di acquisizione. Campi opzionali
+  compatibili con storage 1; nessuna rinominazione o conversione distruttiva.
+- Filtrati placeholder unknown/unavailable, misure non numeriche e variazioni
+  puramente di formato. Codici guasto confrontati senza differenze di maiuscole;
+  chiavi storiche precedenti preservate. Rifiutati ID duplicati nel context.
+- Report con stato persistenza/consegna notifiche e validatore offline dei dati
+  cloud/report già acquisiti, senza stampa di payload, valori o identificativi.
+- Procedura di collaudo cloud reale preparata, non eseguita. Nessun accesso
+  remoto, account Mitsubishi, deploy o modifica del codice di controllo.
+
+- Fondamenta del modello diagnostico comune FTC4/FTC5/FTC6/FTC7: fatti tipizzati,
+  origine, acquisizione, disponibilità e validazione separate. Nessuna compatibilità
+  hardware o cloud dedotta dal solo modello FTC.
+- Registry delle evidenze con contesto modello/firmware/adattatore/trasporto;
+  assenza o ambiguità delle prove restituisce `unknown`.
+- Vista normalizzata degli snapshot cloud nel coordinator e nel report, senza
+  richieste aggiuntive; confronto multi-sorgente puro, senza vincitore automatico.
+- Contratti per telemetria locale e importazione offline. Nessun driver locale,
+  decoder proprietario, soglia termica o azione correttiva implementati.
+- Corretto il registro: campi nulli o codice temporaneamente assente non devono
+  simulare cambi di regolazione o duplicare un guasto ancora attivo.
+- Test sintetici multi-generazione, disponibilità, timestamp, confronto,
+  persistenza, assenza di nuove scritture e packaging isolato.
+- Build con `--output-dir` per verificare HACS senza sovrascrivere pacchetti precedenti.
+- Nessuna migrazione di config entry/storage, nuova dipendenza o modifica dei
+  permessi di controllo. Necessario riavvio HA per caricare codice nuovo.
+- Packaging riproducibile, controllo delle versioni SemVer/PEP 440, checksum,
+  inventario ZIP e pubblicazione in bozza fino a verifica degli asset GitHub.
+- Il publisher riconosce le prerelease e non le imposta come ultima stabile.
+
+### Limitazioni
+
+- Supporto FTC4–FTC7 architetturale: non certifica tutte le sorgenti o installazioni.
+- Nessun collaudo reale. Autenticazione, completezza storico e dati cloud restano
+  da verificare nell'account autorizzato.
+- CN105/Asgard non integrati; importazione SD Mitsubishi non implementata.
+- Selezione sensore TH1A/TH1B non leggibile in modo verificato.
+- Compatibilità proxy MAC-597IF-E sconosciuta. Nessun acquisto hardware richiesto.
+- Notifiche HA best effort; il journal conserva gli eventi salvati senza replay.
+
+### Aggiornamento, assistenza e ripristino
+
+In HACS aprire MELCloud Diagnostics e scegliere **Aggiorna** alla **v0.3.0**,
+oppure menu ⋮ → **Scarica di nuovo / Redownload**, selezionando v0.3.0.
+Fare prima un backup HA protetto e **riavviare Home Assistant** dopo
+l'aggiornamento. Non cancellare né ricreare l'integrazione.
+
+Config entry, credenziali, ID entità/dispositivi, dashboard e involucro storage 1
+sono preservati; i nuovi campi sono opzionali. Non serve una migrazione distruttiva.
+La modalità iniziale resta sola lettura; le opzioni esistenti non vengono riscritte.
+Per il collaudo verificare che le modifiche siano disabilitate. Nessun comando
+aggiunto e nessuna frequenza di polling aumentata.
+
+Per assistenza: **Configura → Assistenza**, poi **Scarica diagnostica** dal menu
+dell'integrazione. Controllare il report prima di condividerlo e segnalare problemi
+su https://github.com/ThatsNotFullAuto/MelCloudHA/issues, indicando versione HA e
+orario/fuso. Non allegare credenziali o backup e non provocare guasti sulla pompa.
+
+Per tornare alla **v0.2.1**, selezionarla in Scarica di nuovo e riavviare HA;
+conservare config entry e registro. I campi aggiuntivi dello storage 1 sono
+leggibili nei test sintetici con Store HA 1. Il downgrade completo su HA reale
+non è stato collaudato. Usare un backup coerente se necessario; il ripristino riporta i dati
+alla data del backup. Non ripristinare parametri sulla pompa.
+
 ## [0.2.1] - 2026-10-30
 
 ### Correzioni

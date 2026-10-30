@@ -1,6 +1,10 @@
 """Distribution compatibility, native dashboard safety and upgrade contracts."""
 
+import hashlib
 import json
+import subprocess
+import sys
+import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -125,3 +129,19 @@ def test_hacs_release_contract_and_readme_installation():
     assert hacs["homeassistant"] == "2026.10.4"
     manifest = json.loads((COMPONENT / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["issue_tracker"].startswith("https://github.com/ThatsNotFullAuto/MelCloudHA/")
+
+
+def test_build_isolated_hacs_package_contains_foundations_and_no_private_files(tmp_path):
+    subprocess.run(
+        [sys.executable, "tools/build_release.py", "--output-dir", str(tmp_path)], check=True,
+        capture_output=True, text=True,
+    )
+    with zipfile.ZipFile(tmp_path / "melcloud_diagnostics.zip") as archive:
+        paths = set(archive.namelist())
+        assert {"core/telemetry.py", "core/capabilities.py", "core/cloud_telemetry.py"} <= paths
+        assert "manifest.json" in paths and "LICENSE" in paths
+        assert all(not p.startswith("custom_components/") for p in paths)
+        assert all("__pycache__" not in p and not p.endswith((".apk", ".txt")) for p in paths)
+    for line in (tmp_path / "SHA256SUMS").read_text().splitlines():
+        digest, name = line.split()
+        assert hashlib.sha256((tmp_path / name).read_bytes()).hexdigest() == digest

@@ -6,17 +6,17 @@ from .const import ALLOW_CONTROL, DOMAIN, PLATFORMS
 async def async_setup_entry(hass, entry):
     from aiomelcloudhome import MelCloudHomeAuth
     from homeassistant.helpers.aiohttp_client import async_get_clientsession
-    from homeassistant.helpers.storage import Store
 
     from .coordinator import DiagnosticCoordinator
     from .core.cloud import CloudReader, SetpointWriter
     from .core.control import ConfirmationGate
     from .core.journal import Journal
+    from .storage import JournalStore
 
     session = async_get_clientsession(hass)
     auth = MelCloudHomeAuth(entry.data["email"], entry.data["password"], session=session)
     reader = CloudReader(session, auth)
-    store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}")
+    store = JournalStore(hass, f"{DOMAIN}.{entry.entry_id}")
     coordinator = DiagnosticCoordinator(
         hass, entry, reader, store, Journal(await store.async_load())
     )

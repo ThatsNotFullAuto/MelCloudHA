@@ -89,3 +89,35 @@ python tools/read_support_report.py percorso-del-report.json
 
 Il formato ha una versione propria, separata da quella dell’integrazione:
 un suo cambiamento incompatibile richiederà un nuovo numero di schema.
+
+## Fatti normalizzati nella 0.3.0
+
+`units.unit_N.normalized_telemetry` è un'aggiunta compatibile allo schema report 1.
+Comprende parametro, valore, unità, `acquired_at`, eventuale `origin_at`, fonte,
+generazione dichiarata, disponibilità, validazione e revisione protocollo se nota.
+La sorgente cloud attuale non fornisce qui una data originaria verificata:
+`origin_at` resta null. Anche la revisione resta null.
+
+Confrontare `acquisition_state`, `last_successful_poll` e l'età delle misure:
+un guasto di rete può coesistere con l'ultimo valore noto, che non diventa una
+nuova misura riuscita. Dopo 180 secondi il report lo marca `stale`. Le entità HA
+mantengono la gestione precedente della disponibilità tramite coordinator.
+Il report omette identificativo unità e istanza sorgente dai fatti esportati;
+non esporta campi arbitrari del payload. Date e dati tecnici restano da controllare
+prima della condivisione. Vedi [modello e limiti](MODELLO_DIAGNOSTICO.md).
+
+## Persistenza e validazione prima del collaudo
+
+`persistence_state` aggiunge `pending_commit`, tipo/data dell'ultimo errore di
+storage, conteggio errori di notifica e politica `best_effort_no_replay`.
+Il blocco `support.findings` può indicare `journal_commit_pending`,
+`journal_storage_error` o `notification_delivery_failed`. Lo schema report resta
+1: sono campi aggiuntivi, non sostituzioni. `acquisition_state.last_error.phase`
+distingue snapshot, storico e storage; non contiene payload o messaggi di errore
+provenienti dal server. Un valore già salvato non significa che lo storico
+successivo sia riuscito.
+
+Il validatore [offline](VALIDAZIONE_DATI_CLOUD.md) produce una mappa dei soli
+campi esposti, mancanti o invalidi. Non stampa valori, ID, nomi o segreti e non
+contatta Mitsubishi. Non cancella o corregge file. Un errore del registro richiede
+verifica dello storage/backup, non cancellazione del file né reset della pompa.

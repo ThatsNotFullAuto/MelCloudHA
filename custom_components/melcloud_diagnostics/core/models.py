@@ -11,6 +11,25 @@ class DataError(ValueError):
     """Unexpected or incomplete upstream data."""
 
 
+ZONE_MODES = frozenset(
+    (
+        "HeatRoomTemperature",
+        "HeatFlowTemperature",
+        "HeatCurve",
+        "CoolRoomTemperature",
+        "CoolFlowTemperature",
+        "DryFloor",
+    )
+)
+MISSING_TEXT = frozenset(("", "unknown", "unavailable", "none", "null", "--"))
+
+
+def error_code(value: Any) -> str | None:
+    if not isinstance(value, str) or value.strip().lower() in MISSING_TEXT:
+        return None
+    return value.strip().upper()
+
+
 def unit_id(value: str) -> str:
     return str(UUID(value))
 
@@ -72,7 +91,9 @@ class Snapshot:
             if not isinstance(item.get("value"), (str, int, float, bool, type(None))):
                 raise DataError("Unexpected structured setting value")
             settings[item["name"]] = item.get("value")
-        capabilities = raw.get("capabilities") or {}
+        capabilities = raw.get("capabilities")
+        if capabilities is None:
+            capabilities = {}
         if not isinstance(capabilities, dict):
             raise DataError("Invalid capabilities")
         try:
@@ -102,7 +123,7 @@ class Fault:
     @property
     def key(self) -> str:
         # Cleared time is mutable; do not duplicate an error when it clears.
-        return f"{self.started.isoformat()}|{self.code}"
+        return f"{self.started.isoformat()}|{self.code.strip().upper()}"
 
     def serialize(self) -> dict:
         return {
@@ -114,7 +135,7 @@ class Fault:
 
     @classmethod
     def parse(cls, raw: dict) -> "Fault":
-        if not isinstance(raw, dict) or not isinstance(raw.get("errorCode"), str):
+        if not isinstance(raw, dict) or error_code(raw.get("errorCode")) is None:
             raise DataError("Invalid error log entry")
         started = timestamp(raw.get("timestamp"))
         cleared = timestamp(raw["clearedTimestamp"]) if raw.get("clearedTimestamp") else None

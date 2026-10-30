@@ -170,3 +170,23 @@ Per segnalazioni usa le [issue del progetto](https://github.com/ThatsNotFullAuto
 La repository è pubblica: non allegare password, token, backup HA o foto con
 dati personali. Il report diagnostico omette le credenziali, ma contiene date
 e dati tecnici: controllalo prima di condividerlo pubblicamente.
+
+## Interpretare il nuovo report diagnostico
+
+Nella 0.3.0 il JSON include `normalized_telemetry` per
+ciascuna unità. Non crea altri sensori né cambia la plancia. `missing` significa
+dato assente; `stale` indica una lettura acquisita da oltre tre minuti; `invalid`
+nella validazione segnala un formato non utilizzabile. Uno zero valido resta zero.
+`structural` conferma soltanto il formato, non l'accuratezza fisica del sensore.
+
+La generazione è quella dichiarata esplicitamente dalla sorgente: non viene
+dedotta dal modello dell'HydroTank. Il riconoscimento FTC4–FTC7 nel software
+non garantisce dati disponibili su ogni impianto. Non occorre acquistare hardware
+o cambiare configurazione. ESPHome e report ufficiali non sono ancora importabili.
+Per P1 usa la [guida diagnostica](GUIDA_DIAGNOSTICA.md).
+
+Nel consolidamento successivo il report segnala anche eventuali salvataggi
+in attesa. In caso di errore storage non eliminare storico o integrazione:
+conserva il report e segui la [procedura di ripristino](AGGIORNAMENTI.md).
+La [procedura di primo collaudo reale](COLLAUDO_MELCLOUD_HOME.md) è preparata
+per un'istanza HA di prova; non è stata eseguita durante lo sviluppo.

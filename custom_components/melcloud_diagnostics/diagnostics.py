@@ -1,9 +1,11 @@
 """Export useful diagnostics without credentials, tokens or household identifiers."""
 
+from datetime import UTC, datetime, timedelta
 from importlib.metadata import version
 from platform import python_version
 
 from .const import VERSION
+from .core.cloud_telemetry import cloud_observations
 from .core.journal import OBSERVED
 from .support import support_envelope
 
@@ -26,6 +28,12 @@ async def async_get_config_entry_diagnostics(hass, entry):
         }
         snapshot = getattr(coordinator, "data", {}).get(identifier)
         if snapshot:
+            # Three missed 60-second polls is a software freshness policy, not an FTC limit.
+            now = datetime.now(UTC)
+            units[aliases[identifier]]["normalized_telemetry"] = [
+                observation.at(now, timedelta(seconds=180)).export()
+                for observation in cloud_observations(snapshot)
+            ]
             units[aliases[identifier]]["current_observation"] = {
                 "observed_at": snapshot.observed_at.isoformat(),
                 "source": snapshot.source,
@@ -70,6 +78,12 @@ async def async_get_config_entry_diagnostics(hass, entry):
             if getattr(coordinator, "last_poll_attempt", None)
             else None,
             "last_error": getattr(coordinator, "last_poll_error", None),
+        },
+        "persistence_state": {
+            "pending_commit": getattr(coordinator, "_pending", None) is not None,
+            "last_error": getattr(coordinator, "storage_error", None),
+            "notification_errors": getattr(coordinator, "notification_errors", 0),
+            "notification_delivery": "best_effort_no_replay",
         },
         "last_successful_poll": coordinator.last_success.isoformat()
         if getattr(coordinator, "last_success", None)

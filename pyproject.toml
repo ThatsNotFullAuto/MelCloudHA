@@ -1,6 +1,6 @@
 [project]
 name = "melcloud-diagnostics"
-version = "0.2.1"
+version = "0.3.0"
 description = "Diagnostic-first MELCloud Home integration for Home Assistant"
 requires-python = ">=3.14.2"
 dependencies = ["aiomelcloudhome==0.3.1"]
