@@ -8,6 +8,8 @@
   documentazione e nei testi del wizard. Il problema era nei file generati,
   non nel browser: i caratteri erano stati sostituiti con punti interrogativi.
 - Aggiunti controlli di regressione sulla codifica UTF-8.
+- Aggiunte anteprime illustrative della plancia, del wizard e dell’assistenza,
+  etichettate come dati fittizi, e chiarimenti sulle dipendenze automatiche.
 
 ### Diagnostica
 

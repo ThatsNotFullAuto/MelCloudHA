@@ -20,8 +20,9 @@ with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
             archive.write(path, path.relative_to(root).as_posix())
     archive.write(root / "README.md", "README.md")
     archive.write(root / "LICENSE", "LICENSE")
-    for path in sorted((root / "docs").rglob("*.md")):
-        archive.write(path, path.relative_to(root).as_posix())
+    for path in sorted((root / "docs").rglob("*")):
+        if path.is_file() and path.suffix in (".md", ".png"):
+            archive.write(path, path.relative_to(root).as_posix())
 with output.open("rb") as source:
     digest = hashlib.file_digest(source, "sha256").hexdigest()
 output.with_suffix(".sha256").write_text(f"{digest}  {output.name}\n", encoding="utf-8")

@@ -11,6 +11,22 @@ Non servono Asgard, accesso al quadro elettrico o modifiche ai collegamenti.
 Se sai già aprire HACS, puoi seguire questi passaggi. L’installazione di HACS
 stesso non è compresa: consulta la [sua guida ufficiale](https://www.hacs.xyz/docs/use/).
 
+### Cosa viene installato automaticamente
+
+Home Assistant installa la libreria Python `aiomelcloudhome` dichiarata
+dall’integrazione e le sue dipendenze. Carica anche il proprio componente
+`zeroconf` per la ricerca locale. Non devi installare pacchetti Python a mano.
+Occorrono Internet e un ambiente HA che consenta l’installazione delle
+dipendenze; un errore di rete o permessi può impedirne lo scaricamento.
+
+La plancia usa solo schede e icone native di HA: non richiede Mushroom,
+card-mod o altri plugin. HACS va invece installato separatamente una volta.
+Non vengono installati automaticamente hardware, applicazioni Mitsubishi,
+ESPHome su schede fisiche o aggiornamenti del sistema operativo.
+
+Se una dipendenza non viene installata, controlla i log di HA e la connessione
+Internet; non modificare le impostazioni della pompa per risolvere il problema.
+
 ## 1. Scarica l’integrazione da GitHub con HACS
 
 1. In Home Assistant apri **HACS**.

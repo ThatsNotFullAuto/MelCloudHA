@@ -45,6 +45,20 @@ Le modifiche sono **opzionali e manuali**: permesso separato, riepilogo prima/do
 nessun reset e nessun reinvio automatico dopo un timeout. La mandata resta
 esclusa dalle scritture nella prima versione.
 
+## Anteprime
+
+**Immagini illustrative con dati fittizi**, non screenshot di un impianto.
+Descrivono le informazioni e i percorsi previsti; l’aspetto reale segue il
+tema, le schede e la versione di Home Assistant.
+
+![Anteprima illustrativa della plancia con dati dimostrativi](docs/images/dashboard-preview.png)
+
+| Configurazione guidata | Assistenza e report |
+|---|---|
+| [![Anteprima illustrativa del wizard](docs/images/wizard-preview.png)](docs/images/wizard-preview.png) | [![Anteprima illustrativa della raccolta diagnostica](docs/images/support-preview.png)](docs/images/support-preview.png) |
+
+Apri un’immagine per vederla più grande. Nessun account o dato reale è mostrato.
+
 ## Aggiornamenti
 
 Le release numerate su GitHub alimentano gli aggiornamenti HACS, con changelog
