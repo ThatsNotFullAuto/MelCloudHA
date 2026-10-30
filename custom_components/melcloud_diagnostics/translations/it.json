@@ -1,0 +1,158 @@
+{
+  "title": "MELCloud Diagnostics",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Benvenuto ? configura il monitoraggio",
+        "description": "Ti aiuteremo a trovare un account MELCloud Home gi? presente in Home Assistant e a scegliere la pompa di calore. Cercheremo anche eventuali dispositivi locali riconoscibili. Non servono indirizzi IP e non cambieremo impostazioni della macchina. Premi Avanti per iniziare."
+      },
+      "reauth_confirm": {
+        "title": "Nuova autenticazione",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "account": {
+        "title": "Accedi a MELCloud Home",
+        "description": "Usa la stessa email e password dell?app MELCloud Home. Non sono le credenziali di Home Assistant o del Wi-Fi. Se non ricordi la password, recuperala dall?app Mitsubishi, poi torna qui. Questo passaggio legge i dispositivi associati al tuo account, senza comandarli.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "discovery": {
+        "title": "Risultato della ricerca",
+        "description": "Account MELCloud Home gi? configurati in HA: {accounts}. Puoi sceglierne uno senza riscrivere la password oppure accedere con un altro account.\n\nDispositivi locali riconosciuti o candidati: {local_devices}. Questi nomi non dimostrano che il dispositivo sia la tua pompa n? che possa essere letto localmente. La MAC-597IF-E pu? non comparire: continueremo cercando le pompe nel tuo account Mitsubishi. Nessun account viene ricavato dalla rete.",
+        "data": {
+          "account": "Quale account vuoi usare?"
+        }
+      },
+      "units": {
+        "title": "Scegli la pompa di calore",
+        "description": "Queste pompe aria-acqua risultano associate al tuo account Mitsubishi. Seleziona quelle che vuoi monitorare. Se compaiono pi? impianti, confronta i nomi con l?app MELCloud Home. La scelta non modifica la macchina.",
+        "data": {
+          "unit_ids": "Pompe da monitorare"
+        }
+      },
+      "finish": {
+        "title": "Tutto pronto ? attiva il monitoraggio",
+        "description": "Pompe selezionate: {units}.\n\nPartiremo in sola lettura: temperature, stato e guasti quando disponibili. Non verr? cambiata alcuna impostazione. Le modifiche manuali resteranno disabilitate.\n\nDopo la conferma, apri il dispositivo appena aggiunto per vedere i sensori. Lo storico errori potrebbe non essere disponibile per tutti gli impianti. Un valore sconosciuto non significa che la macchina sia guasta. Per un report usa il menu dell?integrazione ? Scarica diagnostica."
+      }
+    },
+    "error": {
+      "invalid_auth": "Email o password non accettate. Verifica che funzionino nell?app MELCloud Home e riprova.",
+      "cannot_connect": "Non riusciamo a leggere i dati Mitsubishi. Controlla Internet e riprova pi? tardi. Non cambiare le impostazioni della pompa.",
+      "no_units": "Accesso riuscito, ma non risultano pompe aria-acqua di propriet? di questo account. Controlla di usare lo stesso account dell?app; gli impianti condivisi come ospite non sono ancora inclusi.",
+      "account_missing": "Account non pi? disponibile: scegli un altro account o accedi manualmente.",
+      "select_unit": "Seleziona almeno una pompa tra quelle elencate."
+    },
+    "abort": {
+      "already_configured": "Account già configurato.",
+      "reauth_successful": "Autenticazione aggiornata.",
+      "restart_setup": "La ricerca non ? pi? disponibile. Chiudi questa finestra e aggiungi di nuovo l?integrazione."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "menu_options": {
+          "settings": "Permessi di controllo",
+          "change": "Proponi modifica setpoint",
+          "dashboard": "Prepara la plancia Ecodan"
+        }
+      },
+      "settings": {
+        "description": "Disabilitato per impostazione predefinita. Abilitando questa opzione è possibile usare il percorso manuale con doppia conferma. Non vengono create entità o azioni di comando. I privilegi del token cloud rimangono quelli dell'account.",
+        "data": {
+          "allow_control": "Abilita modifiche manuali con doppia conferma"
+        }
+      },
+      "change": {
+        "title": "Proponi una modifica",
+        "description": "Scegli la pompa e la temperatura che vuoi impostare. Nel passaggio successivo vedrai valore attuale e intervallo consentito. Nessun comando viene inviato durante la scelta.",
+        "data": {
+          "unit_id": "Pompa di calore",
+          "field": "Temperatura da modificare"
+        }
+      },
+      "confirm_first": {
+        "title": "Prima conferma — verifica",
+        "description": "Unità: {unit}\nParametro: {field}\nValore attuale: {old} °C → richiesto: {new} °C\nLimiti dichiarati: {minimum}–{maximum} °C.\nQuesta conferma non invia comandi. È necessaria una seconda conferma. La proposta scade dopo 120 secondi dalla creazione.",
+        "data": {
+          "confirm": "Ho verificato questa precisa modifica e voglio continuare"
+        }
+      },
+      "confirm_final": {
+        "title": "Seconda conferma — invio all'impianto",
+        "description": "Unità: {unit}\nParametro: {field}\n{old} °C → {new} °C\nLimiti dichiarati: {minimum}–{maximum} °C.\nProseguendo con la casella selezionata verrà inviato un comando. Prima dell'invio verranno ricontrollati i valori correnti. Nessun reinvio o ripristino automatico.",
+        "data": {
+          "confirm": "Autorizzo l'invio di questa precisa modifica adesso"
+        }
+      },
+      "result": {
+        "title": "Esito del comando",
+        "description": "{outcome}\n\nPuoi chiudere questa procedura. Le altre impostazioni non sono state modificate da questa richiesta."
+      },
+      "value": {
+        "title": "Scegli la nuova temperatura",
+        "description": "Pompa: {unit}\nImpostazione: {field}\nValore attuale: {old} ?C\nIntervallo consentito: {minimum}?{maximum} ?C\n\nInserisci un valore diverso da quello attuale. Seguiranno due conferme prima dell?invio. {detail}",
+        "data": {
+          "value": "Nuova temperatura"
+        }
+      },
+      "dashboard": {
+        "title": "La tua plancia Ecodan",
+        "description": "Questa configurazione usa i sensori effettivamente presenti in Home Assistant. Non richiede schede personalizzate e non contiene comandi.\n\n1. Copia il testo del riquadro.\n2. Crea una nuova plancia vuota da Impostazioni ? Plance e aprila.\n3. Apri Modifica plancia ? menu ? ? Editor di configurazione grezza.\n4. Incolla il testo e salva. Usa una plancia nuova, perch? sostituir? il contenuto dell?editor.\n\n```yaml\n{yaml}\n```\n\nIl pulsante qui sotto chiude questa guida: la plancia non viene installata automaticamente."
+      }
+    },
+    "error": {
+      "proposal_failed": "Proposta rifiutata. Consulta il dettaglio sopra; nessun comando inviato.",
+      "select_parameter": "Scegli una pompa e una delle temperature elencate."
+    },
+    "abort": {
+      "control_disabled": "Modalità sola lettura: abilita prima le modifiche manuali nei permessi di controllo.",
+      "not_loaded": "Integrazione non caricata.",
+      "proposal_invalid": "Proposta scaduta, invalidata o condizioni cambiate. Nessun nuovo comando inviato; crea una nuova proposta.",
+      "cancelled": "Modifica annullata. Nessun comando inviato.",
+      "outcome_unknown": "Impossibile verificare l'esito. Il comando potrebbe essere arrivato all'impianto. Controlla MELCloud o il display prima di proporre altre modifiche. Nessun reinvio automatico.",
+      "parameter_unavailable": "Questa temperatura non pu? essere modificata nelle condizioni attuali. Pu? dipendere dalla connessione, da un guasto, da limiti non forniti da Mitsubishi oppure dalla regolazione in mandata. Il monitoraggio resta disponibile: usa l?app o il display per verificare la configurazione, senza cambiarla per sbloccare questa procedura.",
+      "entities_not_ready": "I sensori non sono ancora pronti. Attendi un minuto, verifica che il dispositivo sia comparso e riapri Prepara la plancia Ecodan."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "operation_mode": {
+        "state": {
+          "Unknown": "Non noto",
+          "Stop": "In attesa",
+          "HotWater": "Acqua calda sanitaria",
+          "Heating": "Riscaldamento",
+          "Cooling": "Raffrescamento",
+          "FreezeStat": "Protezione antigelo",
+          "LegionellaPrevention": "Prevenzione legionella",
+          "Heat": "Riscaldamento",
+          "HeatZones": "Riscaldamento zone",
+          "Cool": "Raffrescamento"
+        }
+      },
+      "zone_mode": {
+        "state": {
+          "HeatRoomTemperature": "Riscaldamento ? temperatura ambiente",
+          "HeatFlowTemperature": "Riscaldamento ? temperatura acqua",
+          "HeatCurve": "Riscaldamento ? curva climatica",
+          "CoolRoomTemperature": "Raffrescamento ? temperatura ambiente",
+          "CoolFlowTemperature": "Raffrescamento ? temperatura acqua",
+          "DryFloor": "Asciugatura massetto"
+        }
+      },
+      "history_status": {
+        "state": {
+          "available": "Disponibile",
+          "unavailable": "Temporaneamente non disponibile",
+          "unsupported": "Non accessibile per questo impianto/account",
+          "unknown": "Non ancora verificato"
+        }
+      }
+    }
+  }
+}

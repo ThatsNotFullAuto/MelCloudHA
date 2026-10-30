@@ -1,0 +1,19 @@
+# Third-party binaries and reconstructed proprietary code: local analysis only.
+*.apk
+*.xapk
+.tools/
+analysis/assemblies/
+analysis/decompiled/
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.whl
+analysis/aiomelcloudhome-source/
+# Local reverse engineering evidence is never published with the integration.
+analysis/
+.test-ha/
+*.env
+.env*
+secrets.yaml

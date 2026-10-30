@@ -1,0 +1,158 @@
+{
+  "title": "MELCloud Diagnostics",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Welcome ? set up monitoring",
+        "description": "We will look for MELCloud Home accounts already configured in Home Assistant, check for recognizable local devices, and help you choose a heat pump. No IP address is needed. Nothing on the installation will be changed. Select Next to begin."
+      },
+      "reauth_confirm": {
+        "title": "Authenticate again",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "account": {
+        "title": "Sign in to MELCloud Home",
+        "description": "Use the email and password you use in the MELCloud Home app, not your Home Assistant or Wi-Fi credentials. If necessary, recover your password in the Mitsubishi app first. This step only reads the devices linked to your account.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "discovery": {
+        "title": "Search results",
+        "description": "Existing MELCloud Home accounts in HA: {accounts}. Choose one to reuse its saved credentials or sign in to another account.\n\nKnown local devices or candidates: {local_devices}. These names do not prove device identity or local diagnostic compatibility. MAC-597IF-E may not appear; heat pumps will be found through your Mitsubishi account. Accounts cannot be recovered from the network.",
+        "data": {
+          "account": "Which account would you like to use?"
+        }
+      },
+      "units": {
+        "title": "Choose your heat pump",
+        "description": "These air-to-water heat pumps are linked to your Mitsubishi account. Select those you want to monitor. If there are several, compare their names with MELCloud Home. This does not change the installation.",
+        "data": {
+          "unit_ids": "Heat pumps to monitor"
+        }
+      },
+      "finish": {
+        "title": "Ready ? start monitoring",
+        "description": "Selected heat pumps: {units}.\n\nMonitoring starts in read-only mode. Manual changes remain disabled. Once added, open the device to view its sensors. Error history may not be available for every installation. An unknown reading does not mean the machine has a fault. To export a report, use the integration menu ? Download diagnostics."
+      }
+    },
+    "error": {
+      "invalid_auth": "Authentication failed.",
+      "cannot_connect": "Cloud unavailable or unexpected response. Nothing was changed.",
+      "no_units": "No air-to-water units found.",
+      "account_missing": "Account no longer available. Select another account or sign in manually.",
+      "select_unit": "Select at least one listed heat pump."
+    },
+    "abort": {
+      "already_configured": "Account already configured.",
+      "reauth_successful": "Authentication updated.",
+      "restart_setup": "Search results expired. Close this window and add the integration again."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "menu_options": {
+          "settings": "Control permissions",
+          "change": "Propose a setpoint change",
+          "dashboard": "Prepare Ecodan dashboard"
+        }
+      },
+      "settings": {
+        "description": "Disabled by default. Enabling permits only the manual proposal and double-confirmation flow. No writable entities or command actions are created. Account tokens are not restricted server-side.",
+        "data": {
+          "allow_control": "Enable manual changes with double confirmation"
+        }
+      },
+      "change": {
+        "title": "Propose one change",
+        "description": "Choose your heat pump and the temperature to change. The next step shows the current setting and allowed range. No command is sent during selection.",
+        "data": {
+          "unit_id": "Heat pump",
+          "field": "Temperature to change"
+        }
+      },
+      "confirm_first": {
+        "title": "First confirmation — review",
+        "description": "Unit: {unit}\nParameter: {field}\nCurrent: {old} °C → requested: {new} °C\nReported limits: {minimum}–{maximum} °C.\nThis confirmation sends no command. A second confirmation is required. The proposal expires 120 seconds after creation.",
+        "data": {
+          "confirm": "I reviewed this exact change and want to continue"
+        }
+      },
+      "confirm_final": {
+        "title": "Second confirmation — send to the installation",
+        "description": "Unit: {unit}\nParameter: {field}\n{old} °C → {new} °C\nReported limits: {minimum}–{maximum} °C.\nSubmitting with this box checked sends one command. The current values are checked again first. No automatic retry or rollback is performed.",
+        "data": {
+          "confirm": "I authorize sending this exact change now"
+        }
+      },
+      "result": {
+        "title": "Command outcome",
+        "description": "{outcome}\n\nYou can close this wizard."
+      },
+      "value": {
+        "title": "Choose the new temperature",
+        "description": "Heat pump: {unit}\nSetting: {field}\nCurrent: {old} ?C\nAllowed range: {minimum}?{maximum} ?C\n\nEnter a different value. Two confirmations will follow before sending. {detail}",
+        "data": {
+          "value": "New temperature"
+        }
+      },
+      "dashboard": {
+        "title": "Your Ecodan dashboard",
+        "description": "This configuration uses the actual entities registered in Home Assistant. It needs no custom cards and includes no controls.\n\n1. Copy the configuration below.\n2. Create and open a new empty dashboard in Settings ? Dashboards.\n3. Open Edit dashboard ? ? ? Raw configuration editor.\n4. Paste and save. Use a new dashboard: the editor content will be replaced.\n\n```yaml\n{yaml}\n```\n\nThe button below closes this guide. It does not install a dashboard automatically."
+      }
+    },
+    "error": {
+      "proposal_failed": "Proposal rejected. See details above; no command sent.",
+      "select_parameter": "Choose a heat pump and one of the listed temperatures."
+    },
+    "abort": {
+      "control_disabled": "Read-only mode: enable manual changes in Control permissions first.",
+      "not_loaded": "Integration not loaded.",
+      "proposal_invalid": "Proposal expired, was invalidated, or the operating conditions changed. No new command was sent; create a new proposal.",
+      "cancelled": "Change cancelled. No command sent.",
+      "outcome_unknown": "Unable to verify the outcome. A command may have reached the installation. Check MELCloud or the controller before proposing another change. No automatic retry.",
+      "parameter_unavailable": "This temperature cannot currently be changed. The unit may be offline or in error, Mitsubishi may not provide its limits, or the zone may use flow temperature control. Monitoring remains available. Check MELCloud Home or the controller; do not change system configuration just to unlock this procedure.",
+      "entities_not_ready": "Entities are not ready. Wait a minute, check the device has appeared, and open Prepare Ecodan dashboard again."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "operation_mode": {
+        "state": {
+          "Unknown": "Unknown",
+          "Stop": "Idle",
+          "HotWater": "Domestic hot water",
+          "Heating": "Heating",
+          "Cooling": "Cooling",
+          "FreezeStat": "Frost protection",
+          "LegionellaPrevention": "Legionella prevention",
+          "Heat": "Heating",
+          "HeatZones": "Heating zones",
+          "Cool": "Cooling"
+        }
+      },
+      "zone_mode": {
+        "state": {
+          "HeatRoomTemperature": "Heating ? room temperature",
+          "HeatFlowTemperature": "Heating ? water temperature",
+          "HeatCurve": "Heating ? weather curve",
+          "CoolRoomTemperature": "Cooling ? room temperature",
+          "CoolFlowTemperature": "Cooling ? water temperature",
+          "DryFloor": "Floor drying"
+        }
+      },
+      "history_status": {
+        "state": {
+          "available": "Available",
+          "unavailable": "Temporarily unavailable",
+          "unsupported": "Not accessible for this installation/account",
+          "unknown": "Not checked yet"
+        }
+      }
+    }
+  }
+}
