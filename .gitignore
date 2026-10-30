@@ -13,6 +13,7 @@ dist/
 analysis/aiomelcloudhome-source/
 # Local reverse engineering evidence is never published with the integration.
 analysis/
+downloads/
 .test-ha/
 *.env
 .env*
