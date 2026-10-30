@@ -138,3 +138,12 @@ tutte queste evidenze, altrimenti occorrono altre informazioni:
 6. Piano tecnico di installazione e ripristino, con autorizzazione separata.
 
 Il solo successo del collaudo cloud non soddisfa le condizioni hardware.
+
+## Modalità guidata disponibile dalla 0.4.0
+
+La 0.4.0 aggiunge una sessione osservatrice avviabile dalla UI. La
+[procedura guidata e checklist](COLLAUDO_GUIDATO.md) integra questa procedura,
+senza autorizzare prove reali. Prima 20 minuti su HA isolata, misurando il carico
+e verificando app, automazioni e polling invariati; solo dopo valutare 60 minuti.
+24 ore disabilitate. Non modificare impostazioni per creare eventi. Conservare
+backup e risultati parziali; nessun collaudo reale è stato eseguito da Codex.

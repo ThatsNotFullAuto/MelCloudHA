@@ -71,3 +71,13 @@ dedotti da temperature, modello commerciale o assenza di P1.
 file originale resta privato anche se escluso: non allegare payload integrali,
 backup o credenziali. Conservare un originale protetto e condividere inizialmente
 solo l'esito del validatore; verificare anche il report HA prima di condividerlo.
+
+## Report di collaudo guidato — dalla 0.4.0
+
+Il validatore `--kind report` riconosce anche `data.diagnostic_test` nel download
+HA e il report diretto `melcloud_diagnostics.diagnostic_test`, schema 1. Controlla
+il contratto ristretto senza stampare valori misurati. `value_exported=false`
+è redazione volontaria, non indisponibilità cloud: usare availability e conteggi.
+Il tool `tools.read_support_report` legge anche questo formato. Vedi
+[guida collaudo](COLLAUDO_GUIDATO.md) per consenso, limiti, inventario e verifica
+fisica UNKNOWN. La release HACS 0.4.0 genera questi report dopo una sessione.

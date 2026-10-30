@@ -1,5 +1,15 @@
 # Aggiornamenti senza riconfigurare l’impianto
 
+## Release 0.4.0
+
+Seguire la [guida 0.4.0](RELEASE_040.md), con [requisiti e compatibilità](REQUISITI_E_COMPATIBILITA.md).
+Aggiornare da HACS e riavviare HA, senza cancellare o ricreare configurazioni.
+Config entry 1.1, ID e journal storage 1 restano compatibili con la 0.3.0;
+il Collaudo usa storage separato. Le dashboard non sono sovrascritte.
+La 0.3.0 resta disponibile per il ripristino; downgrade su impianto reale non
+collaudato, conservare backup coerente. La CI registra la versione HA risolta
+per ciascun job: pinned/latest uguali non costituiscono due versioni verificate.
+
 ## Release 0.3.0
 
 Seguire la [guida 0.3.0](RELEASE_030.md) per aggiornare dal normale canale

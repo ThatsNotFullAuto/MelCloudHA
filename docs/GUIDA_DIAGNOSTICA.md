@@ -66,3 +66,11 @@ file autentici e una specifica verificata.
 
 Per rollback e backup vedere [Aggiornamenti](AGGIORNAMENTI.md). Nessuna prova
 descritta per il futuro è stata eseguita su account, HA o impianto dei genitori.
+
+## Collaudo guidato — dalla 0.4.0
+
+Il report della nuova sessione distingue P1 osservato attivo, record storici
+accessibili e timestamp di osservazione. Selezione/presenza del sensore e causa
+rimangono UNKNOWN: il collaudo non identifica TH1A/TH1B e non provoca guasti.
+Leggere [guida operativa e limiti](COLLAUDO_GUIDATO.md) prima di una futura prova
+autorizzata. La sessione è disponibile in HACS dalla v0.4.0.

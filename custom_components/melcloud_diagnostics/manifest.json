@@ -1,7 +1,7 @@
 {
   "domain": "melcloud_diagnostics",
   "name": "MELCloud Diagnostics",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "config_flow": true,
   "dependencies": ["zeroconf"],
   "documentation": "https://github.com/ThatsNotFullAuto/MelCloudHA#readme",

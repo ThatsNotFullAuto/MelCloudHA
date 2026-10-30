@@ -5,7 +5,9 @@
 Servono Home Assistant Core **2026.10.4 o successivo**, HACS e un account
 **MELCloud Home** con la pompa già visibile nell’app Mitsubishi.
 La versione corrente è stata verificata con Core 2026.10.4; i test automatici
-controllano anche l’ultima stabile. Non è una promessa per ogni versione futura.
+richiedono anche l’ultima stabile: se i due job risolvono lo stesso numero HA,
+resta una sola versione verificata. Non è una promessa per ogni versione futura.
+[Requisiti completi, browser, account e matrice FTC](REQUISITI_E_COMPATIBILITA.md).
 
 Non servono Asgard, accesso al quadro elettrico o modifiche ai collegamenti.
 Se sai già aprire HACS, puoi seguire questi passaggi. L’installazione di HACS
@@ -44,7 +46,7 @@ Non rimuovere l’eventuale integrazione Mitsubishi già funzionante.
 
 Apri **Impostazioni → Dispositivi e servizi → Aggiungi integrazione** e cerca
 **MELCloud Diagnostics**. La schermata di benvenuto spiega cosa verrà cercato.
-Premi **Avanti** per iniziare.
+Premi **Invia** per iniziare.
 
 Il wizard non cambia temperature, modalità o impostazioni della pompa.
 
@@ -190,3 +192,34 @@ in attesa. In caso di errore storage non eliminare storico o integrazione:
 conserva il report e segui la [procedura di ripristino](AGGIORNAMENTI.md).
 La [procedura di primo collaudo reale](COLLAUDO_MELCLOUD_HOME.md) è preparata
 per un'istanza HA di prova; non è stata eseguita durante lo sviluppo.
+
+## Collaudo guidato nella 0.4.0
+
+Dalla 0.4.0 è disponibile **Configura → Diagnostica → Collaudo diagnostico**: scelta
+pompa e 20/60 minuti, sensori di avanzamento e tempo residuo, stop del solo
+collaudo, report scaricabile dalla UI. Nessuna modifica alla pompa, nessun polling
+aggiuntivo. Per prerequisiti, consenso ai numeri nel report e prima prova su HA
+isolata seguire [Collaudo guidato](COLLAUDO_GUIDATO.md). Le dashboard esistenti non
+vengono aggiornate automaticamente: aggiungere la vista dal nuovo YAML generato.
+
+Il percorso è stato verificato sul frontend reale HA 2026.10.4 con dati
+sintetici, anche su viewport smartphone e tema scuro. Non è un collaudo
+dell'account Mitsubishi. La barra segue il sensore di avanzamento; tempi in
+minuti e controlli di qualità rimangono distinti dal progresso temporale.
+
+![Collaudo in esecuzione — UI reale, dati sintetici](images/diagnostics-collaudo-running.png)
+
+![Avvio e durata — dati sintetici](images/diagnostics-collaudo-start.png)
+
+Premere **Invia** per avviare. Seguire la vista Diagnostica; la barra si aggiorna
+localmente ogni 30 secondi. Per fermare soltanto la raccolta usare il pulsante:
+
+![Stop locale della raccolta — dati sintetici](images/diagnostics-collaudo-interrupted.png)
+
+Al termine leggere esito e controlli, poi usare il download descritto sotto.
+
+[Risultato completo](images/diagnostics-collaudo-complete.png) ·
+[Risultato parziale](images/diagnostics-collaudo-partial.png).
+Per scaricare: chiudere il wizard, aprire **⋮ dell'account → Scarica la diagnostica**.
+Se esiste una sessione, il download contiene il report ristretto del Collaudo:
+indicare separatamente la categoria dell'eventuale richiesta di assistenza.

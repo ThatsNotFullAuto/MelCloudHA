@@ -12,6 +12,10 @@ from .support import support_envelope
 
 async def async_get_config_entry_diagnostics(hass, entry):
     coordinator = entry.runtime_data
+    manager = getattr(coordinator, "test_manager", None)
+    if manager is not None and manager.data is not None:
+        # The test download is a strictly allowlisted report, not a wrapper around raw legacy data.
+        return {"diagnostic_test": await manager.async_export()}
     units = {}
     aliases = {
         identifier: f"unit_{i + 1}"

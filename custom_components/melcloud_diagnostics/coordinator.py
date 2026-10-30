@@ -52,6 +52,9 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
         self._pending = None
         self.storage_error = None
         self.notification_errors = 0
+        self.test_manager = None
+        self._test_histories = {}
+        self._test_events = []
 
     async def _write_pending(self):
         pending = self._pending
@@ -117,7 +120,47 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         async with self._poll_lock:
-            return await self._poll()
+            before = {}
+            if self.test_manager:
+                try:
+                    before = dict(self.reader.health.counts)
+                except Exception:
+                    LOGGER.debug("Diagnostic test transport counters unavailable")
+            try:
+                return await self._poll()
+            finally:
+                # Nonblocking handoff only; no test storage/work is awaited under this lock.
+                if self.test_manager:
+                    try:
+                        health = self.reader.health
+                        statuses = [
+                            health.http_statuses.get(op)
+                            for op in ("account_context", "error_history")
+                            if sum(
+                                health.counts.get(f"{op}:{state}", 0)
+                                - before.get(f"{op}:{state}", 0)
+                                for state in ("success", "error", "cancelled")
+                            )
+                            > 0
+                        ]
+                        self.test_manager.observe_poll(
+                            at=self.last_poll_attempt,
+                            snapshots=self.data
+                            if self.last_success == self.last_poll_attempt
+                            else {},
+                            events=self._test_events,
+                            histories=self._test_histories,
+                            history_status=self.history_status,
+                            history_checked=self.history_checked,
+                            error=(self.last_poll_error or {}).get("type"),
+                            http_statuses=statuses,
+                        )
+                    except Exception:
+                        LOGGER.debug(
+                            "Diagnostic test observer failed; ordinary monitoring continues"
+                        )
+                self._test_histories = {}
+                self._test_events = []
 
     async def _poll(self):
         now = datetime.now(UTC)
@@ -139,6 +182,7 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
                 self.history_success.copy(),
             )
             histories = {}
+            self._test_histories = histories
             terminal_error = None
             phase = "history"
             for identifier in snapshots:
@@ -169,6 +213,7 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
                 await self._finish_pending()
                 staged = Journal(self.journal.data)
                 events = []
+                self._test_events = events
                 for identifier, snapshot in snapshots.items():
                     events.extend(staged.observe(snapshot))
                     if identifier in histories:

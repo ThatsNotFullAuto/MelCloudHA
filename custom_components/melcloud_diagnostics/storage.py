@@ -18,10 +18,14 @@ class JournalStorageError(Exception):
 class JournalStore:
     """Keep the existing HA storage envelope/key/schema; never reset damaged data."""
 
-    def __init__(self, hass, key):
+    def __init__(self, hass, key, *, validator=Journal, clone_in_executor=False):
         self.hass = hass
-        self._store = Store(hass, 1, key, atomic_writes=True)
+        self._store = Store(
+            hass, 1, key, atomic_writes=True, serialize_in_event_loop=not clone_in_executor
+        )
         self._had_file = False
+        self._validator = validator
+        self._clone_in_executor = clone_in_executor
 
     def _read(self):
         try:
@@ -40,8 +44,8 @@ class JournalStore:
         ):
             raise JournalStorageError("Unsupported diagnostic storage envelope")
         try:
-            Journal(envelope["data"])
-        except DataError as err:
+            self._validator(envelope["data"])
+        except (DataError, ValueError, TypeError, KeyError) as err:
             raise JournalStorageError("Invalid diagnostic journal; restore a backup") from err
         return envelope["data"]
 
@@ -59,7 +63,11 @@ class JournalStore:
         existing = await self.hass.async_add_executor_job(self._read)
         if existing is None and self._had_file:
             raise JournalStorageError("Diagnostic storage disappeared; restore before continuing")
-        expected = deepcopy(data)
+        expected = (
+            await self.hass.async_add_executor_job(deepcopy, data)
+            if self._clone_in_executor
+            else deepcopy(data)
+        )
         await self._store.async_save(expected)
         actual = await self.hass.async_add_executor_job(self._read)
         if actual != expected:

@@ -30,6 +30,9 @@ jobs:
           else
             python -m pip install "homeassistant==$HA_VERSION"
           fi
+      - name: Record resolved Home Assistant version
+        run: |
+          python -c "from importlib.metadata import version; print('Resolved Home Assistant: ' + version('homeassistant'))" | tee -a "$GITHUB_STEP_SUMMARY"
       - run: ruff check custom_components tests tools
       - run: pytest -q
       - run: python tools/build_release.py

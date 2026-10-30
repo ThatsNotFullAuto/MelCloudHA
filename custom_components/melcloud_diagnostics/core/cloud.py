@@ -44,6 +44,7 @@ class CloudReader:
         self._auth_lock = auth_lock if auth_lock is not None else asyncio.Lock()
         self._retry_after = 0.0
         self.health = health if health is not None else DiagnosticHealth()
+        self.schema_observer = None
 
     async def _request(
         self, path: str, *, payload: dict | None = None, writer: bool = False, authorize=None
@@ -72,6 +73,12 @@ class CloudReader:
         elapsed = (time.monotonic() - started) * 1000
         self.health.record(operation, "success", elapsed)
         LOGGER.debug("Cloud request completed: operation=%s elapsed_ms=%.1f", operation, elapsed)
+        if not writer and self.schema_observer is not None:
+            try:
+                identifier = path.split("/")[3] if path.startswith("/monitor/atwunit/") else None
+                self.schema_observer(operation, result, identifier)
+            except Exception:
+                LOGGER.debug("Diagnostic schema observer failed; cloud reading continues")
         return result
 
     async def _perform_request(

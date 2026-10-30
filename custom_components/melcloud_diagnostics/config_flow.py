@@ -258,8 +258,154 @@ class DiagnosticOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         return self.async_show_menu(
-            step_id="init", menu_options=["support", "dashboard", "settings", "change"]
+            step_id="init",
+            menu_options=["diagnostics", "support", "dashboard", "settings", "change"],
         )
+
+    def _test_manager(self):
+        runtime = getattr(self.config_entry, "runtime_data", None)
+        manager = getattr(runtime, "test_manager", None)
+        if manager is None:
+            raise ValueError("test_not_loaded")
+        return manager
+
+    async def async_step_diagnostics(self, user_input=None):
+        return self.async_show_menu(
+            step_id="diagnostics",
+            menu_options=["test_setup", "test_status", "test_compare", "test_export"],
+        )
+
+    async def async_step_test_setup(self, user_input=None):
+        from .test_manager import TestSessionError
+
+        try:
+            manager = self._test_manager()
+        except ValueError:
+            return self.async_abort(reason="test_not_loaded")
+        if manager.active:
+            return await self.async_step_test_status()
+        errors = {}
+        runtime = self.config_entry.runtime_data
+        units = {key: snapshot.name for key, snapshot in (runtime.data or {}).items()}
+        for key in self.config_entry.data.get("unit_ids", []):
+            units.setdefault(key, "Ecodan")
+        if user_input is not None:
+            try:
+                if user_input.get("unit_id") not in units:
+                    raise TestSessionError("test_invalid_unit")
+                await manager.async_start(
+                    user_input["unit_id"],
+                    int(user_input.get("duration", "3600")),
+                    controls_enabled=self.config_entry.options.get(ALLOW_CONTROL, False),
+                    export_values=user_input.get("export_values") is True,
+                    replace_previous=user_input.get("replace_previous") is True,
+                )
+            except TestSessionError as err:
+                errors["base"] = str(err)
+            except (ValueError, TypeError):
+                errors["base"] = "test_invalid_duration"
+            else:
+                return await self.async_step_test_status()
+        return self.async_show_form(
+            step_id="test_setup",
+            errors=errors,
+            data_schema=vol.Schema(
+                {
+                    vol.Required("unit_id"): vol.In(units),
+                    vol.Required("duration", default="3600"): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                {"value": "1200", "label": "20 minuti — rapido"},
+                                {"value": "3600", "label": "60 minuti — completo"},
+                            ]
+                        )
+                    ),
+                    vol.Required("export_values", default=False): bool,
+                    vol.Required("replace_previous", default=False): bool,
+                }
+            ),
+        )
+
+    async def async_step_test_status(self, user_input=None):
+        try:
+            manager = self._test_manager()
+        except ValueError:
+            return self.async_abort(reason="test_not_loaded")
+        data = manager.data
+        acquisition = data["acquisition"] if data else {}
+        return self.async_show_menu(
+            step_id="test_status",
+            menu_options=["test_status", "test_stop", "test_compare", "test_export"],
+            description_placeholders={
+                "status": manager.status,
+                "progress": str(manager.progress),
+                "duration": str(data["session"]["duration_seconds"] // 60 if data else 0),
+                "elapsed": str(round(manager.elapsed / 60, 1)),
+                "remaining": str(round(manager.remaining / 60, 1)),
+                "successful": str(acquisition.get("successful", 0)),
+                "failed": str(acquisition.get("failed", 0)),
+                "history": data["fault_history"]["status"] if data else "unknown",
+                "storage": manager.storage_state,
+                "cloud": acquisition.get("cloud", "unknown"),
+                "last_acquisition": acquisition.get("last_acquisition") or "unknown",
+                "reason": manager._reason
+                or (data["session"]["stop_reason"] if data else None)
+                or "unknown",
+                "dropped": str(manager._dropped),
+                "passed": str(
+                    sum(c["result"] == "PASS" for c in data["verification_results"])
+                    if data and not manager.active
+                    else 0
+                ),
+                "failed_checks": str(
+                    sum(c["result"] == "FAIL" for c in data["verification_results"])
+                    if data and not manager.active
+                    else 0
+                ),
+                "unverifiable": str(
+                    sum(
+                        c["result"] in ("UNKNOWN", "UNSUPPORTED", "INCONCLUSIVE")
+                        for c in data["verification_results"]
+                    )
+                    if data and not manager.active
+                    else 0
+                ),
+            },
+        )
+
+    async def async_step_test_stop(self, user_input=None):
+        try:
+            await self._test_manager().async_stop()
+        except ValueError:
+            return self.async_abort(reason="test_not_loaded")
+        return await self.async_step_test_status()
+
+    async def async_step_test_compare(self, user_input=None):
+        from .core.test_session import COMPARISONS
+        from .test_manager import TestSessionError
+
+        errors = {}
+        try:
+            manager = self._test_manager()
+            if user_input is not None:
+                await manager.async_compare(user_input.get("comparison"))
+                return await self.async_step_test_status()
+        except TestSessionError as err:
+            errors["base"] = str(err)
+        except ValueError:
+            return self.async_abort(reason="test_not_loaded")
+        return self.async_show_form(
+            step_id="test_compare",
+            errors=errors,
+            data_schema=vol.Schema(
+                {vol.Required("comparison", default="non_verificati"): vol.In(COMPARISONS)}
+            ),
+        )
+
+    async def async_step_test_export(self, user_input=None):
+        if user_input is not None:
+            return self.async_abort(reason="test_report_ready")
+        return self.async_show_form(step_id="test_export", data_schema=vol.Schema({}))
 
     async def async_step_support(self, user_input=None):
         from datetime import UTC, datetime
