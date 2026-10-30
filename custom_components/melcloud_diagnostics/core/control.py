@@ -1,6 +1,7 @@
 """Expiring, one-use double confirmation for a single exact setpoint change."""
 
 import asyncio
+import logging
 import secrets
 import time
 from dataclasses import dataclass
@@ -8,6 +9,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 from .models import Snapshot, boolean, number
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ControlError(ValueError):
@@ -114,6 +117,7 @@ class ConfirmationGate:
         self.lock = asyncio.Lock()
 
     def invalidate(self):
+        LOGGER.debug("Manual control revoked; outstanding proposal count=%d", len(self.pending))
         self.pending.clear()
         self.writer = None
 
@@ -132,6 +136,7 @@ class ConfirmationGate:
     async def propose(self, owner, unit, field, value) -> Proposal:
         async with self.lock:
             if self.writer is None:
+                LOGGER.debug("Change proposal rejected: read-only mode")
                 raise ControlError("Controllo disabilitato: modalità sola lettura")
             snapshot = await self.reader.read_unit(unit, datetime.now(UTC))
             context = validate(snapshot, field, value)
@@ -150,6 +155,7 @@ class ConfirmationGate:
                 self.clock() + 120,
             )
             self.pending[proposal.token] = proposal
+            LOGGER.debug("Change proposal prepared: field=%s confirmations=0", field)
             return proposal
 
     async def confirm_first(self, token, owner) -> Proposal:
@@ -164,6 +170,7 @@ class ConfirmationGate:
 
             confirmed = replace(proposal, token=secrets.token_urlsafe(32), stage=1)
             self.pending[confirmed.token] = confirmed
+            LOGGER.debug("First confirmation accepted: field=%s", proposal.field)
             return confirmed
 
     async def execute(self, token, owner) -> str:
@@ -191,6 +198,10 @@ class ConfirmationGate:
                     await self.audit(record)
                 raise ControlError("Proposta scaduta o controllo disabilitato prima dell'invio")
             try:
+                LOGGER.debug(
+                    "Second confirmation accepted: field=%s; checking final authorization",
+                    proposal.field,
+                )
                 writer = self.writer
 
                 def authorize():
@@ -201,11 +212,13 @@ class ConfirmationGate:
                     proposal.unit, proposal.field, proposal.value, authorize=authorize
                 )
             except ControlError:
+                LOGGER.debug("Setpoint request cancelled before network send")
                 record["status"] = "cancelled_before_send"
                 if self.audit:
                     await self.audit(record)
                 raise
             except Exception:
+                LOGGER.debug("Setpoint request outcome unknown; no automatic retry")
                 # Timeout may mean the command was applied. Never automatically resend.
                 record["status"] = "outcome_unknown"
                 if self.audit:
@@ -220,4 +233,7 @@ class ConfirmationGate:
                 pass
             if self.audit:
                 await self.audit(record)
+            LOGGER.debug(
+                "Setpoint request finished: field=%s status=%s", proposal.field, record["status"]
+            )
             return record["status"]

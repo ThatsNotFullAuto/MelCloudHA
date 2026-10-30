@@ -5,7 +5,7 @@
 Diagnostica per Mitsubishi Ecodan in Home Assistant, tramite **MELCloud Home**.
 Parte in **sola lettura**. Non richiede hardware aggiuntivo.
 
-**Versione 0.2.0 ? prima pubblicazione, da validare sull?impianto reale.**
+**Versione 0.2.1 — da validare sull’impianto reale.**
 Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
 
 ## Inizia da qui
@@ -13,24 +13,25 @@ Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
 - [Installazione HACS e prima configurazione guidata](docs/GUIDA_UTENTE.md).
 - [Plancia Ecodan: stato, temperature e guasti](docs/GUIDA_UTENTE.md#la-plancia-ecodan).
 - [Aggiornamenti, changelog e conservazione dei dati](docs/AGGIORNAMENTI.md).
+- [Debug guidato e report per l’assistenza](docs/DEBUG.md).
 - [Changelog](CHANGELOG.md) e [release scaricabili](https://github.com/ThatsNotFullAuto/MelCloudHA/releases).
 - [Limiti e dettagli tecnici](docs/DETTAGLI_TECNICI.md).
 
 ## Installa da HACS
 
-In **HACS ? menu ? ? Repository personalizzate**, aggiungi:
+In **HACS → menu ⋮ → Repository personalizzate**, aggiungi:
 
 ```text
 https://github.com/ThatsNotFullAuto/MelCloudHA
 ```
 
 Scegli categoria **Integrazione**, scarica **MELCloud Diagnostics** e riavvia
-Home Assistant quando richiesto. Poi apri **Impostazioni ? Dispositivi e
-servizi ? Aggiungi integrazione ? MELCloud Diagnostics**.
+Home Assistant quando richiesto. Poi apri **Impostazioni → Dispositivi e
+servizi → Aggiungi integrazione → MELCloud Diagnostics**.
 
-Il wizard cerca account MELCloud Home gi? presenti in HA, propone il loro
+Il wizard cerca account MELCloud Home già presenti in HA, propone il loro
 riuso, cerca eventuali candidati locali ESPHome/Asgard e ti fa scegliere le
-pompe associate all?account Mitsubishi. Non devi conoscere l?indirizzo IP.
+pompe associate all’account Mitsubishi. Non devi conoscere l’indirizzo IP.
 I candidati in rete non sono identificazioni certe della MAC-597IF-E.
 
 ## Cosa ottieni
@@ -47,16 +48,16 @@ esclusa dalle scritture nella prima versione.
 ## Aggiornamenti
 
 Le release numerate su GitHub alimentano gli aggiornamenti HACS, con changelog
-e indicazione del riavvio. Aggiorna l?installazione esistente: non eliminarla e
-ricrearla. Entit?, credenziali e storico hanno identificativi/formati stabili;
+e indicazione del riavvio. Aggiorna l’installazione esistente: non eliminarla e
+ricrearla. Entità, credenziali e storico hanno identificativi/formati stabili;
 le plance esistenti non vengono sovrascritte. Vedi la [procedura completa](docs/AGGIORNAMENTI.md).
 
 ## Progetto indipendente
 
-Non ? un?integrazione ufficiale Mitsubishi o Home Assistant. L?icona ? un
+Non è un’integrazione ufficiale Mitsubishi o Home Assistant. L’icona è un
 emblema originale: casa azzurra, richiamo ai tre diamanti e segnale diagnostico;
 non riutilizza il logo ufficiale Home Assistant.
 Non sono inclusi APK, codice proprietario decompilato, credenziali o dati di un impianto reale.
 
-I test usano risposte sintetiche: disponibilit? dei dati e comportamento con
-l?account reale vanno ancora verificati. Leggere P1 non ne dimostra la causa.
+I test usano risposte sintetiche: disponibilità dei dati e comportamento con
+l’account reale vanno ancora verificati. Leggere P1 non ne dimostra la causa.

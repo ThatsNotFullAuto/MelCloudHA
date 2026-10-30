@@ -3,7 +3,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Welcome ? set up monitoring",
+        "title": "Welcome — set up monitoring",
         "description": "We will look for MELCloud Home accounts already configured in Home Assistant, check for recognizable local devices, and help you choose a heat pump. No IP address is needed. Nothing on the installation will be changed. Select Next to begin."
       },
       "reauth_confirm": {
@@ -35,8 +35,8 @@
         }
       },
       "finish": {
-        "title": "Ready ? start monitoring",
-        "description": "Selected heat pumps: {units}.\n\nMonitoring starts in read-only mode. Manual changes remain disabled. Once added, open the device to view its sensors. Error history may not be available for every installation. An unknown reading does not mean the machine has a fault. To export a report, use the integration menu ? Download diagnostics."
+        "title": "Ready — start monitoring",
+        "description": "Selected heat pumps: {units}.\n\nMonitoring starts in read-only mode. Manual changes remain disabled. Once added, open the device to view its sensors. Error history may not be available for every installation. An unknown reading does not mean the machine has a fault. To export a report, use the integration menu → Download diagnostics."
       }
     },
     "error": {
@@ -58,7 +58,8 @@
         "menu_options": {
           "settings": "Control permissions",
           "change": "Propose a setpoint change",
-          "dashboard": "Prepare Ecodan dashboard"
+          "dashboard": "Prepare Ecodan dashboard",
+          "support": "Support · prepare diagnostics"
         }
       },
       "settings": {
@@ -95,14 +96,25 @@
       },
       "value": {
         "title": "Choose the new temperature",
-        "description": "Heat pump: {unit}\nSetting: {field}\nCurrent: {old} ?C\nAllowed range: {minimum}?{maximum} ?C\n\nEnter a different value. Two confirmations will follow before sending. {detail}",
+        "description": "Heat pump: {unit}\nSetting: {field}\nCurrent: {old} °C\nAllowed range: {minimum}–{maximum} °C\n\nEnter a different value. Two confirmations will follow before sending. {detail}",
         "data": {
           "value": "New temperature"
         }
       },
       "dashboard": {
         "title": "Your Ecodan dashboard",
-        "description": "This configuration uses the actual entities registered in Home Assistant. It needs no custom cards and includes no controls.\n\n1. Copy the configuration below.\n2. Create and open a new empty dashboard in Settings ? Dashboards.\n3. Open Edit dashboard ? ? ? Raw configuration editor.\n4. Paste and save. Use a new dashboard: the editor content will be replaced.\n\n```yaml\n{yaml}\n```\n\nThe button below closes this guide. It does not install a dashboard automatically."
+        "description": "This configuration uses the actual entities registered in Home Assistant. It needs no custom cards and includes no controls.\n\n1. Copy the configuration below.\n2. Create and open a new empty dashboard in Settings → Dashboards.\n3. Open Edit dashboard → ⋮ → Raw configuration editor.\n4. Paste and save. Use a new dashboard: the editor content will be replaced.\n\n```yaml\n{yaml}\n```\n\nThe button below closes this guide. It does not install a dashboard automatically."
+      },
+      "support": {
+        "title": "Prepare diagnostics for support",
+        "description": "Choose the issue you are seeing. The report includes software versions, acquisition health and recent communication errors. No technical knowledge or heat pump setting changes are needed. Debug logging is not required for an initial report.",
+        "data": {
+          "category": "Which issue would you like to report?"
+        }
+      },
+      "support_ready": {
+        "title": "Report ready to download",
+        "description": "Report reference: **{reference}**.\n\n1. Select Finish to close this window.\n2. In the ⋮ menu next to your MELCloud Diagnostics account, select **Download diagnostics**.\n3. Keep the JSON file unchanged and attach it to your support request. Explain what failed and when.\n\nThe file includes versions, the selected issue category, acquisition status and available operational data. It excludes account passwords and tokens, but contains installation timestamps and temperatures. Review it before publishing.\n\nIf detailed logs are needed, enable debug logging, reproduce only the problematic operation, then disable debug logging to download the log. Do not change heat pump settings to collect a report."
       }
     },
     "error": {
@@ -116,7 +128,9 @@
       "cancelled": "Change cancelled. No command sent.",
       "outcome_unknown": "Unable to verify the outcome. A command may have reached the installation. Check MELCloud or the controller before proposing another change. No automatic retry.",
       "parameter_unavailable": "This temperature cannot currently be changed. The unit may be offline or in error, Mitsubishi may not provide its limits, or the zone may use flow temperature control. Monitoring remains available. Check MELCloud Home or the controller; do not change system configuration just to unlock this procedure.",
-      "entities_not_ready": "Entities are not ready. Wait a minute, check the device has appeared, and open Prepare Ecodan dashboard again."
+      "entities_not_ready": "Entities are not ready. Wait a minute, check the device has appeared, and open Prepare Ecodan dashboard again.",
+      "invalid_support_category": "Choose one of the listed issue categories.",
+      "support_not_loaded": "The integration is not loaded. Use its menu to enable debug logging, retry startup, then disable debug logging to download the log. Do not delete the configuration."
     }
   },
   "entity": {
@@ -137,11 +151,11 @@
       },
       "zone_mode": {
         "state": {
-          "HeatRoomTemperature": "Heating ? room temperature",
-          "HeatFlowTemperature": "Heating ? water temperature",
-          "HeatCurve": "Heating ? weather curve",
-          "CoolRoomTemperature": "Cooling ? room temperature",
-          "CoolFlowTemperature": "Cooling ? water temperature",
+          "HeatRoomTemperature": "Heating · room temperature",
+          "HeatFlowTemperature": "Heating · water temperature",
+          "HeatCurve": "Heating · weather curve",
+          "CoolRoomTemperature": "Cooling · room temperature",
+          "CoolFlowTemperature": "Cooling · water temperature",
           "DryFloor": "Floor drying"
         }
       },

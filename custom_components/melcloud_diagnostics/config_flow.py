@@ -1,6 +1,7 @@
 """Setup and explicit double-confirmation UI; no command services or writable entities."""
 
 import hashlib
+import logging
 
 import voluptuous as vol
 from aiomelcloudhome import MelCloudHomeAuth
@@ -25,6 +26,8 @@ from .core.control import FIELDS, ControlError, field_details
 from .core.models import DataError
 from .discovery import account_label, async_local_hints, existing_accounts
 from .presentation import field_label, outcome_message
+
+LOGGER = logging.getLogger(__name__)
 
 
 async def validate_credentials(hass, data):
@@ -55,6 +58,12 @@ class DiagnosticConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_search(self, user_input=None):
         self._accounts = existing_accounts(self.hass)
         hints, status = await async_local_hints(self.hass)
+        LOGGER.debug(
+            "Setup search completed: saved_accounts=%d local_hints=%d local_status=%s",
+            len(self._accounts),
+            len(hints),
+            status,
+        )
         # Display untrusted discovery labels as plain text without Markdown formatting.
         names = []
         for hint in hints:
@@ -83,6 +92,7 @@ class DiagnosticConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if choice == "manual":
                 return await self.async_step_account()
             if choice in self._accounts:
+                LOGGER.debug("Setup: user selected an existing account for reuse")
                 entry = self._accounts[choice]
                 return await self.async_step_account(
                     {"email": entry.data["email"], "password": entry.data["password"]}
@@ -111,8 +121,10 @@ class DiagnosticConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 units = await validate_credentials(self.hass, user_input)
             except (AuthenticationError, MelCloudHomeAuthenticationError):
+                LOGGER.debug("Setup account validation failed: authentication")
                 errors["base"] = "invalid_auth"
             except (CloudError, MelCloudHomeError, DataError):
+                LOGGER.debug("Setup account validation failed: connection or response format")
                 errors["base"] = "cannot_connect"
             else:
                 if not units:
@@ -127,6 +139,7 @@ class DiagnosticConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         "password": user_input["password"],
                     }
                     self._units = units
+                    LOGGER.debug("Setup account validation succeeded: atw_units=%d", len(units))
                     return await self.async_step_units()
         return self.async_show_form(
             step_id="account",
@@ -155,6 +168,7 @@ class DiagnosticConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 and all(identifier in self._units for identifier in selected)
             ):
                 self._selected_ids = list(dict.fromkeys(selected))
+                LOGGER.debug("Setup unit selection accepted: count=%d", len(self._selected_ids))
                 return await self.async_step_finish()
             errors["base"] = "select_unit"
         options = [{"value": k, "label": s.name} for k, s in self._units.items()]
@@ -244,7 +258,59 @@ class DiagnosticOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         return self.async_show_menu(
-            step_id="init", menu_options=["dashboard", "settings", "change"]
+            step_id="init", menu_options=["support", "dashboard", "settings", "change"]
+        )
+
+    async def async_step_support(self, user_input=None):
+        from datetime import UTC, datetime
+        from uuid import uuid4
+
+        from .support import PROBLEM_LABELS
+
+        if user_input is not None:
+            category = user_input.get("category")
+            if category not in PROBLEM_LABELS:
+                return self.async_abort(reason="invalid_support_category")
+            try:
+                runtime = self._runtime()
+            except ControlError:
+                return self.async_abort(reason="support_not_loaded")
+            runtime.support_context = {
+                "report_id": str(uuid4()),
+                "problem_category": category,
+                "prepared_at": datetime.now(UTC).isoformat(),
+            }
+            return await self.async_step_support_ready()
+        return self.async_show_form(
+            step_id="support",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("category"): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                {"value": key, "label": label}
+                                for key, label in PROBLEM_LABELS.items()
+                            ]
+                        )
+                    )
+                }
+            ),
+        )
+
+    async def async_step_support_ready(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(title="", data=dict(self.config_entry.options))
+        try:
+            runtime = self._runtime()
+        except ControlError:
+            return self.async_abort(reason="support_not_loaded")
+        context = runtime.support_context
+        if not context:
+            return await self.async_step_support()
+        return self.async_show_form(
+            step_id="support_ready",
+            data_schema=vol.Schema({}),
+            description_placeholders={"reference": context["report_id"]},
         )
 
     async def async_step_dashboard(self, user_input=None):

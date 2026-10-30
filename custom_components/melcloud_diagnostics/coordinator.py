@@ -28,6 +28,9 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
         self.history_checked = {}
         self.history_success = {}
         self.last_success = None
+        self.last_poll_attempt = None
+        self.last_poll_error = None
+        self.support_context = None
         self._save_lock = asyncio.Lock()
 
     async def save(self):
@@ -40,14 +43,22 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         now = datetime.now(UTC)
+        self.last_poll_attempt = now
+        LOGGER.debug("Diagnostic poll started")
         try:
             snapshots = await self.reader.discover(now)
             selected = self.config_entry.data.get("unit_ids") if self.config_entry else None
             if selected is not None:
                 snapshots = {k: s for k, s in snapshots.items() if k in selected}
         except (AuthenticationError, MelCloudHomeAuthenticationError) as err:
+            self.last_poll_error = {"type": type(err).__name__, "at": now.isoformat()}
+            LOGGER.debug(
+                "Diagnostic poll needs reauthentication: error_type=%s", type(err).__name__
+            )
             raise ConfigEntryAuthFailed("Riautenticazione MELCloud necessaria") from err
         except (CloudError, DataError, MelCloudHomeError) as err:
+            self.last_poll_error = {"type": type(err).__name__, "at": now.isoformat()}
+            LOGGER.debug("Diagnostic poll failed: error_type=%s", type(err).__name__)
             raise UpdateFailed("Acquisizione MELCloud non riuscita") from err
         events = []
         for identifier, snapshot in snapshots.items():
@@ -59,10 +70,12 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
                     faults = await self.reader.history(identifier)
                 except HistoryUnsupported:
                     self.history_status[identifier] = "unsupported"
+                    LOGGER.debug("Error history is not supported or not authorized")
                 except (AuthenticationError, MelCloudHomeAuthenticationError) as err:
                     raise ConfigEntryAuthFailed("Riautenticazione MELCloud necessaria") from err
                 except (CloudError, DataError, MelCloudHomeError):
                     self.history_status[identifier] = "unavailable"
+                    LOGGER.debug("Error history could not be read; previous records preserved")
                 else:
                     events.extend(self.journal.merge_faults(identifier, faults))
                     self.history_status[identifier] = "available"
@@ -70,6 +83,10 @@ class DiagnosticCoordinator(DataUpdateCoordinator):
         # Persist before notifying; restarts must not replay historical notifications.
         await self.save()
         self.last_success = now
+        self.last_poll_error = None
         for event in events:
             self.hass.bus.async_fire(f"{DOMAIN}_observation", event)
+        LOGGER.debug(
+            "Diagnostic poll completed: units=%d observations=%d", len(snapshots), len(events)
+        )
         return snapshots

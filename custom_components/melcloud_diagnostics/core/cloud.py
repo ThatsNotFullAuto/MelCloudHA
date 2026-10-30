@@ -1,15 +1,26 @@
 """Small allowlisted transport; upstream authentication is reused, controls are not."""
 
 import asyncio
+import logging
 import re
 import time
 from typing import Any
 
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
+from .health import DiagnosticHealth
 from .models import DataError, Fault, Snapshot, unit_id
 
 API_BASE = "https://mobile.bff.melcloudhome.com"
+LOGGER = logging.getLogger(__name__)
+
+
+def operation_name(path, writer):
+    if writer:
+        return "setpoint_write"
+    if path == "/context":
+        return "account_context"
+    return "error_history" if path.endswith("/errorlog") else "unit_snapshot"
 
 
 class CloudError(Exception):
@@ -27,13 +38,43 @@ class HistoryUnsupported(CloudError):
 class CloudReader:
     """Only exposes diagnostic GETs; no arbitrary URL or request method."""
 
-    def __init__(self, session: ClientSession, auth, *, auth_lock=None) -> None:
+    def __init__(self, session: ClientSession, auth, *, auth_lock=None, health=None) -> None:
         self._session = session
         self._auth = auth
         self._auth_lock = auth_lock if auth_lock is not None else asyncio.Lock()
         self._retry_after = 0.0
+        self.health = health if health is not None else DiagnosticHealth()
 
     async def _request(
+        self, path: str, *, payload: dict | None = None, writer: bool = False, authorize=None
+    ) -> Any:
+        operation = operation_name(path, writer)
+        started = time.monotonic()
+        LOGGER.debug("Cloud request started: operation=%s", operation)
+        try:
+            result = await self._perform_request(
+                path, payload=payload, writer=writer, authorize=authorize
+            )
+        except asyncio.CancelledError:
+            self.health.record(operation, "cancelled", (time.monotonic() - started) * 1000)
+            LOGGER.debug("Cloud request cancelled: operation=%s", operation)
+            raise
+        except Exception as error:
+            elapsed = (time.monotonic() - started) * 1000
+            self.health.record(operation, "error", elapsed, type(error).__name__)
+            LOGGER.debug(
+                "Cloud request failed: operation=%s error_type=%s elapsed_ms=%.1f",
+                operation,
+                type(error).__name__,
+                elapsed,
+            )
+            raise
+        elapsed = (time.monotonic() - started) * 1000
+        self.health.record(operation, "success", elapsed)
+        LOGGER.debug("Cloud request completed: operation=%s elapsed_ms=%.1f", operation, elapsed)
+        return result
+
+    async def _perform_request(
         self, path: str, *, payload: dict | None = None, writer: bool = False, authorize=None
     ) -> Any:
         unit_path = re.fullmatch(r"/monitor/atwunit/[0-9a-f-]{36}", path)
@@ -63,6 +104,11 @@ class CloudReader:
                 timeout=ClientTimeout(total=20),
                 allow_redirects=False,
             ) as response:
+                operation = operation_name(path, writer)
+                self.health.http_statuses[operation] = response.status
+                LOGGER.debug(
+                    "Cloud response: operation=%s http_status=%d", operation, response.status
+                )
                 if response.status == 401:
                     raise AuthenticationError("Authentication expired")
                 if response.status == 429:

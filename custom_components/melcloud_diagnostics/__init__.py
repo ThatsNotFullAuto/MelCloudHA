@@ -21,7 +21,7 @@ async def async_setup_entry(hass, entry):
         hass, entry, reader, store, Journal(await store.async_load())
     )
     writer = (
-        SetpointWriter(session, auth, auth_lock=reader._auth_lock)
+        SetpointWriter(session, auth, auth_lock=reader._auth_lock, health=reader.health)
         if entry.options.get(ALLOW_CONTROL, False)
         else None
     )

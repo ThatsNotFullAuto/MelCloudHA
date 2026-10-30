@@ -1,7 +1,7 @@
 {
   "domain": "melcloud_diagnostics",
   "name": "MELCloud Diagnostics",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "config_flow": true,
   "dependencies": ["zeroconf"],
   "documentation": "https://github.com/ThatsNotFullAuto/MelCloudHA#readme",
@@ -9,5 +9,6 @@
   "codeowners": ["@ThatsNotFullAuto"],
   "integration_type": "hub",
   "iot_class": "cloud_polling",
+  "loggers": ["custom_components.melcloud_diagnostics"],
   "requirements": ["aiomelcloudhome==0.3.1"]
 }

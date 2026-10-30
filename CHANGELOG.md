@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.2.1] - 2026-10-30
+
+### Correzioni
+
+- Ripristinati accenti, apostrofi, frecce, simboli di grado e menu nella
+  documentazione e nei testi del wizard. Il problema era nei file generati,
+  non nel browser: i caratteri erano stati sostituiti con punti interrogativi.
+- Aggiunti controlli di regressione sulla codifica UTF-8.
+
+### Diagnostica
+
+- Logging di debug attivabile dal menu standard dell’integrazione in HA.
+- Log di operazioni cloud, stato HTTP, tempi, errori di lettura, wizard e
+  conferme. Nessuna registrazione di password, token, identificativi unità
+  o risposte cloud integrali nei messaggi di debug del progetto.
+- Report con versioni, stato delle acquisizioni, ultime richieste e snapshot
+  disponibili. La cronologia tecnica in memoria è limitata a 100 richieste.
+- Guida italiana per raccogliere log e report, e disattivare il debug.
+- Percorso Assistenza per scegliere il problema e recuperare il JSON con
+  riferimento univoco e formato versionato; lettore del report per chi sviluppa.
+
+### Aggiornamento
+
+- Riavviare Home Assistant dopo l’aggiornamento del codice.
+- Nessuna migrazione dei dati; configurazione, entità, storico e plance
+  restano invariati. Le proposte di modifica pendenti non vengono riprese.
+- Nessuna modifica dei parametri dell’impianto e nessun nuovo comando di controllo.
+
 ## [0.2.0] - 2026-10-30
 
 Prima pubblicazione su GitHub e HACS. Versione iniziale da validare sull'impianto reale.
