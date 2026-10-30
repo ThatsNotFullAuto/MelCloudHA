@@ -1,6 +1,8 @@
 # MELCloud Diagnostics — Home Assistant
 
-Versione **0.2.0**, per Mitsubishi Ecodan tramite **MELCloud Home**.
+Versione **0.3.0**, per Mitsubishi Ecodan tramite **MELCloud Home**.
+Tag v0.3.0, manifest e metadati Python 0.3.0. È una release ordinaria senza
+collaudo reale; la 0.2.1 resta disponibile come versione precedente.
 Acquisizione diagnostica di sola lettura predefinita, con modifiche manuali
 opzionali vincolate a due conferme distinte. Non richiede Asgard.
 
@@ -193,3 +195,47 @@ ricostruiti dall'APK mediante analisi statica e implementati separatamente,
 senza includere codice proprietario decompilato nel pacchetto distribuibile.
 L'APK proviene da un mirror e la firma non è stata confrontata con un
 certificato Mitsubishi ufficiale: il protocollo resta da validare sul servizio.
+
+## Incremento multi-sorgente incluso nella 0.3.0
+
+`Snapshot`, sorgente cloud, sensori, frequenze 60 secondi/15 minuti e storage
+HA versione 1 rimangono i contratti precedenti. `core/cloud_telemetry.py` è una
+trasformazione pura: produce `Observation` senza I/O, autenticazione o accesso al
+writer. Il coordinator espone `telemetry` dopo un poll riuscito. Il report
+normalizza anche gli snapshot disponibili e segnala i valori più vecchi di 180
+secondi come `stale`; questa è una politica software di tre poll, non un limite
+termico Mitsubishi. Un errore cloud resta nello stato acquisizioni; non trasforma
+un valore precedentemente noto in zero.
+
+Le osservazioni normalizzate sono solo in memoria/report. Il registro conserva
+guasti e variazioni nella struttura esistente; non viene introdotto un archivio
+continuo delle misure. Campi nulli non alterano la baseline dell'ultimo stato noto.
+Non viene ancora alimentato il registro da sorgenti locali.
+
+Contratti, scelta dei timestamp e confronto sono descritti nel
+[modello diagnostico](MODELLO_DIAGNOSTICO.md). Le capacità documentali sono nella
+[matrice delle sorgenti](SORGENTI_E_COMPATIBILITA.md); non sono autorizzazioni
+ad attivare trasporti o richieste service.
+
+## Consolidamento della persistenza incluso nella 0.3.0
+
+`storage.JournalStore` mantiene chiave e involucro HA storage 1, usa scritture
+atomiche e verifica su disco i dati salvati. È necessario perché Store HA nella
+versione di riferimento può limitarsi a loggare alcuni errori di scrittura.
+Un file non valido viene preservato e segnalato, senza ripartenza da registro vuoto.
+
+Il coordinator modifica una copia del journal e adotta i risultati solo dopo
+conferma. Errori/timeout mantengono il commit in memoria; il recupero precede
+nuove chiamate cloud. I nuovi guasti storici notificati sono conservati anche
+nelle osservazioni, con `event_id` e `observed_at`. Lo storico iniziale continua
+a non emettere notifiche retroattive. Valori mancanti, placeholder, codici
+con diversa capitalizzazione e setpoint equivalenti numericamente non simulano
+variazioni. Snapshot precedenti all'ultima osservazione non arretrano la baseline.
+
+ID delle entità, dati raw dello Snapshot, trasporto e frequenze rimangono quelli
+precedenti. Non cambia il codice del controllo opzionale; solo la callback audit
+beneficia del medesimo confine di commit. Test confermano che un audit fallito
+impedisce l'invio e non riprende automaticamente il comando.
+
+Vedi [rapporto affidabilità](AFFIDABILITA_E_COLLAUDO.md),
+[verifica offline](VALIDAZIONE_DATI_CLOUD.md) e [collaudo](COLLAUDO_MELCLOUD_HOME.md).

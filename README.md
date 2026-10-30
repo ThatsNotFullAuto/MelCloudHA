@@ -5,10 +5,12 @@
 Diagnostica per Mitsubishi Ecodan in Home Assistant, tramite **MELCloud Home**.
 Parte in **sola lettura**. Non richiede hardware aggiuntivo.
 
-**Versione 0.2.1 — da validare sull’impianto reale.**
+**Versione 0.3.0 — release ordinaria, senza collaudo sull’impianto reale.**
 Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
 
 ## Inizia da qui
+
+- [Aggiornare alla 0.3.0 tramite HACS e ripristinare la versione precedente](docs/RELEASE_030.md).
 
 - [Installazione HACS e prima configurazione guidata](docs/GUIDA_UTENTE.md).
 - [Plancia Ecodan: stato, temperature e guasti](docs/GUIDA_UTENTE.md#la-plancia-ecodan).
@@ -75,3 +77,28 @@ Non sono inclusi APK, codice proprietario decompilato, credenziali o dati di un 
 
 I test usano risposte sintetiche: disponibilità dei dati e comportamento con
 l’account reale vanno ancora verificati. Leggere P1 non ne dimostra la causa.
+
+## Fondamenta FTC4–FTC7 nella 0.3.0
+
+Il modello comune conserva valore, unità, fonte, generazione dichiarata,
+disponibilità e timestamp. Il report aggiunge `normalized_telemetry`; le entità,
+gli ID e il registro esistenti restano compatibili. Non aggiunge interrogazioni
+cloud o comandi. La 0.2.1 resta disponibile come precedente versione stabile.
+
+FTC4, FTC5, FTC6 e FTC7 sono rappresentabili nel modello: questo **non certifica
+il trasporto MELCloud Home su ogni generazione**. ESPHome/CN105 e importazione
+dei report Mitsubishi hanno soltanto contratti di estensione; nessun adattatore
+locale o decoder SD/Bluetooth è operativo. Nessuna prova su impianto reale.
+
+Consulta la [matrice e le fonti](docs/SORGENTI_E_COMPATIBILITA.md), il
+[modello tecnico](docs/MODELLO_DIAGNOSTICO.md), la
+[guida P1](docs/GUIDA_DIAGNOSTICA.md) e il
+[rapporto di questo ciclo](docs/AUDIT_FTC_2026-10-30.md).
+
+Il consolidamento incluso nella 0.3.0 aggiunge persistenza atomica verificata,
+recupero dei commit in attesa e test di interruzione. Le notifiche HA restano
+senza ricevuta; il registro persistente è la fonte per il recupero degli eventi.
+Sono disponibili la [procedura di collaudo cloud](docs/COLLAUDO_MELCLOUD_HOME.md),
+il [validatore offline](docs/VALIDAZIONE_DATI_CLOUD.md) e il
+[rapporto di affidabilità](docs/AFFIDABILITA_E_COLLAUDO.md). Il collaudo reale
+non è stato eseguito e richiederà autorizzazione separata.

@@ -140,6 +140,8 @@ class CloudReader:
                 raise DataError("Invalid building")
             for item in building.get("airToWaterUnits", []):
                 snapshot = Snapshot.parse(item, now)
+                if snapshot.id in result:
+                    raise DataError("Duplicate unit in account context")
                 result[snapshot.id] = snapshot
         return result
 

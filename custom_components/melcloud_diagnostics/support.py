@@ -19,6 +19,12 @@ def support_envelope(coordinator):
     findings = []
     if getattr(coordinator, "last_success", None) is None:
         findings.append("no_successful_poll_since_load")
+    if getattr(coordinator, "_pending", None) is not None:
+        findings.append("journal_commit_pending")
+    if getattr(coordinator, "storage_error", None):
+        findings.append("journal_storage_error")
+    if getattr(coordinator, "notification_errors", 0):
+        findings.append("notification_delivery_failed")
     for status in set(coordinator.history_status.values()):
         if status in ("unsupported", "unavailable"):
             findings.append(f"error_history_{status}")

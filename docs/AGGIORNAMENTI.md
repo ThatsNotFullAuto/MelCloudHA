@@ -1,5 +1,19 @@
 # Aggiornamenti senza riconfigurare l’impianto
 
+## Release 0.3.0
+
+Seguire la [guida 0.3.0](RELEASE_030.md) per aggiornare dal normale canale
+HACS. Tag v0.3.0, manifest/costante/Python 0.3.0. Riavvio HA richiesto,
+nessuna modifica sulla pompa.
+Config entry 1.1 e storage 1 compatibili con 0.2.1, senza reset o migrazione
+distruttiva. Fare backup prima dell'aggiornamento. Per tornare indietro scegliere
+v0.2.1 in HACS e riavviare, preservando account e registro.
+
+La pubblicazione ordinaria rende la 0.3.0 latest. ZIP HACS esatto:
+`melcloud_diagnostics.zip`. Il workflow verifica entrambe le versioni HA previste,
+crea una bozza, carica gli asset e ne controlla dimensioni e digest prima di renderla
+pubblica con prerelease=false. Una bozza incompleta non va pubblicata manualmente.
+
 ## Come arriva un aggiornamento
 
 Quando viene pubblicata una nuova **release GitHub**, HACS può rilevarla e
@@ -64,3 +78,56 @@ versione precedente. Riavvia poi HA. In caso di dubbi usa un backup coerente
 con quella versione, preservando sia configurazione sia registro.
 
 La prima pubblicazione 0.2.0 mantiene schema e ID del prototipo 0.1.0.
+
+## Checkpoint locali precedenti (storico)
+
+I paragrafi seguenti documentano le build locali precedenti al versionamento
+della 0.3.0. Per installare la versione corrente usare la guida sopra.
+
+Questo incremento mantiene config entry 1.1, storage 1, versione pacchetto 0.2.1,
+dominio, identificativi e dashboard. Nessuna migrazione o riconfigurazione è
+necessaria. La vista normalizzata si ricostruisce al poll successivo; lo storico
+precedente viene letto come prima. Il registro ignora valori nulli nelle variazioni.
+
+Prima di un eventuale collaudo autorizzato, salvare un backup HA coerente che
+comprenda configurazione e `.storage/melcloud_diagnostics.<entry_id>`. Il rollback
+del codice alla 0.2.1 non richiede conversione del registro; ripristinare il backup
+solo se occorre recuperare anche lo stato precedente. Non eliminare config entry
+o registro e non ripristinare impostazioni sulla pompa. Questa sessione non esegue
+installazioni, ripristini o prove sull'impianto reale.
+
+Per una verifica locale dei pacchetti senza sostituire quelli già in `dist`:
+
+```powershell
+.venv/Scripts/python.exe tools/build_release.py --output-dir dist/validation-ftc-foundation
+```
+
+Il pacchetto ottenuto è soltanto un artefatto di verifica, con versione ancora
+0.2.1: non caricarlo su GitHub né sostituire gli asset della release pubblicata.
+
+## Consolidamento persistenza e ripristino
+
+Il consolidamento aggiunge soltanto campi opzionali allo storage 1; i test
+leggono registri precedenti e verificano che Store HA 1 legga ancora quelli nuovi.
+Non occorre ricreare account o entità. File corrotti, futuri/non riconosciuti e
+file scomparsi durante l'esecuzione bloccano il salvataggio invece di essere
+azzerati. Non modificarli manualmente per aggirare il controllo.
+
+In caso di errore: conserva il report e una copia protetta del registro; interrompi
+l'istanza HA di prova, verifica spazio/permessi e ripristina un backup coerente
+di configurazione e storage. Riavvia e confronta guasti e ID. Ripristinare una
+versione precedente del codice non richiede conversione dei campi aggiuntivi;
+un ripristino del backup riporta anche la storia al momento del backup.
+Se il file manca già al primo caricamento, il software non può distinguere una
+prima installazione da una cancellazione precedente: serve il confronto con il
+backup. Nessun ripristino dell'impianto è necessario.
+
+Per il pacchetto di questo secondo ciclo usa una destinazione distinta:
+
+```powershell
+.venv/Scripts/python.exe tools/build_release.py --output-dir dist/validation-reliability
+```
+
+Versione ancora 0.2.1, artefatto non rilasciato; i pacchetti precedenti restano
+intatti. Installazione reale e collaudo seguono la
+[procedura dedicata](COLLAUDO_MELCLOUD_HOME.md), solo dopo autorizzazione.
