@@ -89,6 +89,28 @@ def test_generation_never_inferred_from_model_or_number(name):
     assert FTCGeneration.from_declared(name) == FTCGeneration.UNKNOWN
 
 
+@pytest.mark.parametrize("number", [4, 5, 6, 7])
+@pytest.mark.parametrize("template", ["ftc{}", "ftC{}", "  FtC{}\t"])
+def test_explicit_ftc_labels_accept_case_and_surrounding_whitespace(number, template):
+    assert FTCGeneration.from_declared(template.format(number)) == FTCGeneration(f"FTC{number}")
+
+
+@pytest.mark.parametrize("label", [7, False, {}, "FTC 7", "FTC7 presumed",
+                                    "FT\u04217", "FTC7\u200b", "FTC7" + " " * 1000])
+def test_label_normalization_never_interprets_nonlabels_or_unbounded_text(label):
+    assert FTCGeneration.from_declared(label) == FTCGeneration.UNKNOWN
+
+
+def test_case_normalization_preserves_raw_label_and_unverified_capabilities(raw_unit):
+    raw_unit["ftcModel"] = "ftC7"
+    snapshot = Snapshot.parse(raw_unit, NOW)
+    facts = cloud_observations(snapshot)
+    assert snapshot.ftc_model == "ftC7"
+    assert all(f.generation == FTCGeneration.FTC7 for f in facts)
+    assert all(f.validation != Validation.VERIFIED_REAL for f in facts)
+    assert REGISTRY.lookup(FTCGeneration.FTC7, Source.MELCLOUD_HOME, "FlowTemperature").status == EvidenceStatus.UNKNOWN
+
+
 def test_capability_restrictions_and_ambiguity():
     entry = Capability(
         generation=FTCGeneration.FTC7,

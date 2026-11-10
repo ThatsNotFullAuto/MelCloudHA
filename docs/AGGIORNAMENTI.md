@@ -2,6 +2,14 @@
 
 ## Release 0.4.0
 
+Per l'aggiornamento corrente usare la [guida 0.4.1](RELEASE_041.md). HACS può
+rilevare la release ordinaria ai propri controlli periodici; se non compare,
+aggiornare le informazioni o scegliere Scarica di nuovo → v0.4.1. Riavvio HA
+richiesto, senza eliminare account o configurazioni. Schema 1 e journal invariati;
+la 0.4.0 resta disponibile e un downgrade torna anche alle vecchie interpretazioni.
+
+Le istruzioni seguenti descrivono la release 0.4.0.
+
 Seguire la [guida 0.4.0](RELEASE_040.md), con [requisiti e compatibilità](REQUISITI_E_COMPATIBILITA.md).
 Aggiornare da HACS e riavviare HA, senza cancellare o ricreare configurazioni.
 Config entry 1.1, ID e journal storage 1 restano compatibili con la 0.3.0;

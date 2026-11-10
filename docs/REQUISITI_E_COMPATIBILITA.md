@@ -1,9 +1,10 @@
-# Requisiti e compatibilità — v0.4.0
+# Requisiti e compatibilità — v0.4.1
 
 Questa pagina distingue requisiti del software, verifiche automatiche/frontend
-e compatibilità con un impianto reale. **Nessun account Mitsubishi o dispositivo
-reale è stato collaudato.** La release ordinaria distribuisce il software
-disponibile, senza certificare la diagnostica completa FTC.
+e compatibilità con un impianto reale. **Un report utente è stato analizzato
+offline per una singola unità.** Questa evidenza non è una validazione fisica
+indipendente né una certificazione di tutte le installazioni FTC.
+La 0.4.1 conserva i requisiti e il formato schema 1 della 0.4.0.
 
 ## Requisiti per installare e usare l'integrazione
 
@@ -67,6 +68,12 @@ Versioni e risultati della verifica sono nel [rapporto frontend](VERIFICA_FRONTE
 
 ## Compatibilità FTC4–FTC7 e sorgenti
 
+Le etichette esplicite FTC4–FTC7 sono riconosciute anche con maiuscole miste
+e spazi esterni (ad esempio `ftC7`). È una dichiarazione del cloud, non una
+verifica fisica. Modello dell'unità e firmware non determinano la generazione.
+Il sensore mostra ancora il testo originale. I vecchi report `unknown` non
+vengono riclassificati senza nuove acquisizioni.
+
 | Generazione | Modello diagnostico | MELCloud Home per quella generazione | CN105/Asgard locale | Importazione SD/report di servizio |
 |---|---|---|---|---|
 | FTC4 | Implementato, fixture sintetiche | **Unknown** sull'impianto reale | Non implementata | Non implementata |
@@ -97,5 +104,5 @@ sono verificate. Nessun decoder SD, Bluetooth o CN105, nessun comando operativo
 aggiuntivo e nessuna correzione automatica. Le credenziali conservano i privilegi
 dell'account: la modalità read-only è una separazione software.
 
-[Installazione](GUIDA_UTENTE.md) · [Release 0.4.0 e ripristino](RELEASE_040.md) ·
+[Installazione](GUIDA_UTENTE.md) · [Release 0.4.1 e ripristino](RELEASE_041.md) ·
 [Primo collaudo di 20 minuti](COLLAUDO_GUIDATO.md).

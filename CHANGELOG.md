@@ -1,5 +1,66 @@
 # Changelog
 
+## [0.4.1] - 2026-11-10
+
+**Correzione compatibile del report di Collaudo, release ordinaria.**
+Un report utente è stato analizzato offline per una singola unità.
+Nessun collaudo fisico indipendente: causa P1 e compatibilità di tutti gli
+impianti FTC restano non verificate. Nessun dato privato nelle fixture.
+
+### Corretto
+
+- Un campo presente come stringa vuota, null, valore non interpretabile o redatto
+  non viene più dichiarato automaticamente assente nel cloud.
+- Le assenze usano prove strutturali per operazione; inventario mancante,
+  troncato o copertura insufficiente lasciano la conclusione indeterminata.
+  Non si sommano operazioni diverse per compensare acquisizioni senza inventario.
+- Il fallback del flag errore non viene ignorato quando può essere nascosto da
+  un alias. Fatti missing, stale o invalidi non attestano un P1 attivo.
+- Il lettore offline separa codici correnti, flag attivo e record storici/P1;
+  la presenza di ftcModel non certifica una generazione riconosciuta.
+- Riconoscimento delle etichette esplicite FTC4–FTC7 con maiuscole miste e spazi
+  esterni (`ftC7` → `FTC7`), mantenendo il testo originale nel sensore.
+  Nessuna deduzione da modello o firmware e nessuna capacità hardware certificata.
+- Protezione Git dei download diagnostici privati. Le regressioni usano soltanto
+  dati sintetici, senza copie del report dell'utente.
+
+### Compatibilità e limiti
+
+Schema JSON 1, contatori normalizzati, config entry, ID, dashboard e journal
+invariati. Il significato di code_readable rimane quello del codice corrente
+interpretabile, distinto dallo storico. Nessun valore FTC grezzo esportato,
+nuovo consenso, endpoint, retry, polling o comando operativo. Controlli manuali
+preesistenti invariati; tenerli disabilitati durante il Collaudo.
+
+I conteggi dello schema sono aggregati e non provano una corrispondenza temporale
+individuale tra ogni frame e ogni acquisizione. Una lista degli assenti vuota non
+certifica la completezza del cloud. Sensore selezionato, TH1A/TH1B, causa P1,
+CN105/Asgard e importazione SD non diventano disponibili con questa patch.
+
+### Aggiornamento HACS
+
+Con la repository già configurata, HACS può rilevare la **v0.4.1** ai propri
+controlli periodici. Aprire **HACS → MELCloud Diagnostics → Aggiorna**, quindi
+**riavviare Home Assistant** in un momento opportuno. Se necessario aggiornare
+le informazioni della repository o usare **Scarica di nuovo → v0.4.1**.
+Non eliminare né ricreare l'integrazione. Fare prima un backup verificato.
+
+Scaricare il rapporto da **⋮ dell'account → Scarica la diagnostica**.
+Le sessioni precedenti mantengono la versione software originaria nei metadati;
+per nuovi metadati 0.4.1 avviare una sessione autorizzata di 20 minuti, dopo
+aver esportato e autorizzato la sostituzione del risultato precedente.
+Non provocare guasti o cambiare impostazioni della pompa.
+
+La **v0.4.0 resta disponibile**: esportare e fermare il Collaudo, scegliere
+v0.4.0 in Scarica di nuovo e riavviare HA. Il formato rimane leggibile, ma torna
+la precedente interpretazione delle assenze. Downgrade fisico non collaudato:
+conservare configurazione, journal e backup coerente.
+
+![Collaudo — interfaccia 0.4.0 conservata nella 0.4.1, dati sintetici](https://raw.githubusercontent.com/ThatsNotFullAuto/MelCloudHA/v0.4.1/docs/images/diagnostics-collaudo-running.png)
+
+[Guida aggiornamento e limiti](https://github.com/ThatsNotFullAuto/MelCloudHA/blob/v0.4.1/docs/RELEASE_041.md) ·
+[Requisiti e compatibilità](https://github.com/ThatsNotFullAuto/MelCloudHA/blob/v0.4.1/docs/REQUISITI_E_COMPATIBILITA.md).
+
 ## [0.4.0] - 2026-10-30
 
 **Release ordinaria. Nessun collaudo con account Mitsubishi o impianto reale
