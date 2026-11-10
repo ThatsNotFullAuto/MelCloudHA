@@ -5,9 +5,10 @@
 Diagnostica per Mitsubishi Ecodan in Home Assistant, tramite **MELCloud Home**.
 Parte in **sola lettura**. Non richiede hardware aggiuntivo.
 
-**Versione 0.4.0 — release ordinaria con Collaudo diagnostico guidato.**
-Nessun collaudo con account Mitsubishi o impianto reale ancora eseguito.
-Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
+**Versione 0.4.1 — report del Collaudo più precisi, formato compatibile.**
+Un report utente è stato analizzato offline per una singola unità. Restano
+non verificate accuratezza fisica, causa P1 e compatibilità di tutti gli impianti.
+Frontend verificato su HA Core **2026.10.4**; versioni CI effettive nei workflow.
 
 ## Inizia da qui
 
@@ -16,7 +17,7 @@ Testata con HA Core **2026.10.4**, ultima stabile verificata al 30 ottobre 2026.
 - [Requisiti e compatibilità](docs/REQUISITI_E_COMPATIBILITA.md): versioni software,
   account, browser e stato effettivo del supporto FTC4–FTC7.
 
-- [Aggiornare alla 0.4.0 tramite HACS e ripristinare la 0.3.0](docs/RELEASE_040.md).
+- [Ricevere la 0.4.1 tramite HACS e ripristinare la 0.4.0](docs/RELEASE_041.md).
 
 - [Installazione HACS e prima configurazione guidata](docs/GUIDA_UTENTE.md).
 - [Plancia Ecodan: stato, temperature e guasti](docs/GUIDA_UTENTE.md#la-plancia-ecodan).
@@ -54,6 +55,11 @@ I candidati in rete non sono identificazioni certe della MAC-597IF-E.
   certificata. [Matrice completa e limiti](docs/REQUISITI_E_COMPATIBILITA.md).
 
 ## Cosa ottieni
+
+La 0.4.1 corregge le assenze dichiarate nel report: un campo presente senza
+valore utilizzabile non diventa automaticamente assente nel cloud. Schema 1,
+contatori normalizzati, ID e journal sono conservati. I metadati aggregati non
+certificano la corrispondenza temporale fra ogni frame e ogni lettura.
 
 Temperature e impostazioni osservabili, stato operativo, codice guasto,
 storico errori quando disponibile, ricorrenze P1, report esportabili e una
@@ -110,8 +116,9 @@ emblema originale: casa azzurra, richiamo ai tre diamanti e segnale diagnostico;
 non riutilizza il logo ufficiale Home Assistant.
 Non sono inclusi APK, codice proprietario decompilato, credenziali o dati di un impianto reale.
 
-I test usano risposte sintetiche: disponibilità dei dati e comportamento con
-l’account reale vanno ancora verificati. Leggere P1 non ne dimostra la causa.
+I test automatici usano risposte sintetiche. L'analisi offline di un report utente
+aggiunge evidenza circoscritta sulle letture, senza certificare tutti gli account
+o il funzionamento fisico. Leggere P1 non ne dimostra la causa.
 
 ## Fondamenta FTC4–FTC7 nella 0.3.0
 

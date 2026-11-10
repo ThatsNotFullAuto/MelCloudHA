@@ -81,3 +81,16 @@ il contratto ristretto senza stampare valori misurati. `value_exported=false`
 Il tool `tools.read_support_report` legge anche questo formato. Vedi
 [guida collaudo](COLLAUDO_GUIDATO.md) per consenso, limiti, inventario e verifica
 fisica UNKNOWN. La release HACS 0.4.0 genera questi report dopo una sessione.
+
+Nella 0.4.1 l'eventuale `absent_in_observed_cloud` deriva dall'inventario
+strutturale completo della specifica operazione osservata, non dai contatori
+normalizzati. Campo presente ma vuoto, `null`, sentinel o valore redatto non è
+assente; se l'inventario manca o è troncato, l'assenza non è determinabile. Una
+lista assenti vuota non prova completezza API. I conteggi `decoded` present,
+missing, invalid e changes mantengono il significato precedente. `code_readable`
+si riferisce al codice corrente interpretabile esportato; codici storici e P1
+sono indipendenti. FTC `UNKNOWN` non significa `ftcModel` assente né implica FTC7.
+
+È stata svolta analisi offline di un report utente per una sola unità. Non si
+pubblicano date, temperature o ID e non si afferma validazione fisica o
+compatibilità universale.

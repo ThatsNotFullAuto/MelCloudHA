@@ -8,6 +8,7 @@ from datetime import timedelta
 from typing import TypedDict
 
 from .models import ZONE_MODES, DataError, timestamp
+from .report_evidence import interpretable_fact, observed_parameter_presence
 from .test_privacy import (
     CANDIDATES,
     CAPABILITIES,
@@ -303,12 +304,24 @@ def evaluate(report):
     acq, history = result["acquisition"], result["fault_history"]
     result["verification_results"] = verification_results(result)
     facts = [f for sample in result["temporal_observations"] for f in sample["facts"]]
-    codes = [f["value"] for f in facts if f["parameter"] == "ErrorCode" and f["value"]]
+    codes = [
+        safe_code(f["value"])
+        for f in facts
+        if f["parameter"] == "ErrorCode" and interpretable_fact(f) and safe_code(f["value"])
+    ]
     active = [
         sample
         for sample in result["temporal_observations"]
-        if any(f["parameter"] == "in_error" and f["value"] is True for f in sample["facts"])
-        and any(f["parameter"] == "ErrorCode" and f["value"] == "P1" for f in sample["facts"])
+        if any(
+            f["parameter"] == "in_error" and f["value"] is True and interpretable_fact(f)
+            for f in sample["facts"]
+        )
+        and any(
+            f["parameter"] == "ErrorCode"
+            and safe_code(f["value"]) == "P1"
+            and interpretable_fact(f)
+            for f in sample["facts"]
+        )
     ]
     result["p1_investigation"] = {
         "code_readable": bool(codes),
@@ -332,7 +345,9 @@ def evaluate(report):
         field["source"] = "melcloud_home"
     result["missing_evidence"] = {
         "absent_in_observed_cloud": [
-            k for k, v in result["decoded_parameters"].items() if not v["present"]
+            k
+            for k in result["decoded_parameters"]
+            if observed_parameter_presence(result, k) is False
         ],
         "present_uninterpreted": [k for k, v in fields.items() if v["decoder"] is None],
         "unexpected_format": [k for k, v in result["decoded_parameters"].items() if v["invalid"]],

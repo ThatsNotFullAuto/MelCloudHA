@@ -20,3 +20,5 @@ private-captures/
 .env*
 secrets.yaml
 codex.txt
+# Private Home Assistant diagnostic downloads, for local analysis only.
+/config_entry-melcloud_diagnostics-*.json

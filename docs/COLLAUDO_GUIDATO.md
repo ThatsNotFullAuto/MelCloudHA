@@ -1,5 +1,10 @@
 # Collaudo diagnostico guidato — v0.4.0
 
+La correzione 0.4.1 conserva questo percorso e il formato schema 1. L'inventario
+è aggregato: le assenze descritte riguardano i frame inventariati e non provano
+una corrispondenza temporale individuale fra ogni frame e ogni acquisizione.
+Per aggiornamento HACS e riavvio vedere [Release 0.4.1](RELEASE_041.md).
+
 Disponibile dalla **v0.4.0**, con interfaccia verificata su dati sintetici.
 Nessun account Mitsubishi o impianto reale è stato ancora collaudato. La prima
 prova deve avvenire su HA isolata e autorizzata prima di valutarne l'uso domestico.
@@ -195,6 +200,11 @@ richiesti all'utente per avviare/scaricare il collaudo.
 
 ## Come interpretare P1 e le informazioni mancanti
 
+Per la 0.4.1 è stato analizzato offline un report utente relativo a una sola
+unità. Questa evidenza non viene pubblicata con date, temperature o ID e non
+costituisce validazione fisica, certificazione FTC o prova di compatibilità
+universale.
+
 P1 attivo è osservato solo se sono presenti insieme codice P1 e stato errore vero.
 Si conservano primo istante di **osservazione** e date dei record storici
 interpretati. Lo storico vuoto accessibile non prova assenza di guasti passati.
@@ -210,6 +220,16 @@ timestamp locali di acquisizione ordinati, non dato fisico fresco. La verifica
 fisica indipendente resta UNKNOWN. UNKNOWN, UNSUPPORTED e INCONCLUSIVE non sono
 guasti. I conteggi per parametro hanno come denominatore le acquisizioni valide
 della sessione; i conteggi di presenza schema usano i frame della stessa operazione.
+
+`absent_in_observed_cloud` indica che il campo non compare nell'inventario
+strutturale completo dell'operazione osservata; non è dedotto dai contatori dei
+valori decodificati. Campo presente ma vuoto, `null`, sentinel o numero redatto
+non equivale ad assenza. Se l'inventario manca o è troncato, l'assenza non è
+determinabile; anche una lista delle assenze vuota non dimostra che l'API sia
+completa. I contatori `decoded` (present/missing/invalid/changes) mantengono il
+loro significato per i soli valori normalizzati. `code_readable` descrive il
+codice corrente interpretabile ed esportato; P1 e codici storici sono evidenze
+separate. FTC `UNKNOWN` non implica che `ftcModel` sia assente né identifica FTC7.
 
 Il report separa campi assenti, presenti non interpretati, formati inattesi,
 storico inaccessibile, acquisizioni fallite, parametri FTC non verificabili e

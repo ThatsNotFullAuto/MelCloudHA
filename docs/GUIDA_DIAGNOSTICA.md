@@ -74,3 +74,14 @@ accessibili e timestamp di osservazione. Selezione/presenza del sensore e causa
 rimangono UNKNOWN: il collaudo non identifica TH1A/TH1B e non provoca guasti.
 Leggere [guida operativa e limiti](COLLAUDO_GUIDATO.md) prima di una futura prova
 autorizzata. La sessione è disponibile in HACS dalla v0.4.0.
+
+La 0.4.1 include l'analisi offline di un report utente per una sola unità; non
+sono pubblicati date, temperature o ID. È un'evidenza circoscritta, non una
+validazione fisica né una certificazione FTC o di compatibilità universale.
+L'assenza osservata deriva dall'inventario strutturale completo della singola
+operazione, non dai contatori dei valori decodificati. Campo vuoto, `null`,
+sentinel o valore redatto resta distinto dall'assenza; inventario mancante o
+troncato rende l'assenza indeterminabile. Una lista assenti vuota non prova la
+completezza dell'API. `code_readable` riguarda il codice corrente interpretabile
+esportato; codici storici/P1 restano indipendenti. FTC `UNKNOWN` non indica
+`ftcModel` assente e non equivale a FTC7.

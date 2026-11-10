@@ -18,7 +18,7 @@ from packaging.version import Version
 
 from tools.publish_release import publish, release_plan, version_metadata
 
-TAG = "v0.4.0"
+TAG = "v0.4.1"
 SHA = "a" * 40
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -78,11 +78,11 @@ def test_version_is_equivalent_for_python_homeassistant_and_tag(packages):
         (ROOT / "custom_components/melcloud_diagnostics/manifest.json").read_text()
     )
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())
-    assert manifest["version"] == "0.4.0"
-    assert project["project"]["version"] == "0.4.0"
+    assert manifest["version"] == "0.4.1"
+    assert project["project"]["version"] == "0.4.1"
     assert Version(manifest["version"]) == Version(project["project"]["version"])
     assert AwesomeVersion(manifest["version"]).valid and not AwesomeVersion(manifest["version"]).beta
-    assert AwesomeVersion("0.3.0") < AwesomeVersion(manifest["version"]) == AwesomeVersion("0.4.0")
+    assert AwesomeVersion("0.4.0") < AwesomeVersion(manifest["version"]) == AwesomeVersion("0.4.1")
     metadata, assets, notes = release_plan(TAG, dist=packages)
     assert metadata["prerelease"] is False and "Nessun collaudo" in notes and len(assets) == 3
 
@@ -95,6 +95,7 @@ def test_version_is_equivalent_for_python_homeassistant_and_tag(packages):
         ("v0.3.0-rc.2", "0.3.0rc2", True),
         ("v0.3.0", "0.3.0", False),
         ("v0.4.0", "0.4.0", False),
+        ("v0.4.1", "0.4.1", False),
     ],
 )
 def test_stable_and_prerelease_are_explicitly_distinguished(tag, python, prerelease):
@@ -104,9 +105,9 @@ def test_stable_and_prerelease_are_explicitly_distinguished(tag, python, prerele
 @pytest.mark.parametrize(
     "values",
     [
-        (TAG, "0.4.0", "0.4.0b1", "0.4.0-beta.1"),
-        (TAG, "0.4.0-beta.1", "0.4.0", "0.4.0-beta.1"),
-        (TAG, "0.4.0-beta.1", "0.4.0b1", "0.3.0"),
+        (TAG, "0.4.1", "0.4.1b1", "0.4.1-beta.1"),
+        (TAG, "0.4.1-beta.1", "0.4.1", "0.4.1-beta.1"),
+        (TAG, "0.4.1-beta.1", "0.4.1b1", "0.4.0"),
         ("v0.3.0-nightly", "0.3.0-nightly", "0.3.0.dev1", "0.3.0-nightly"),
     ],
 )
@@ -127,7 +128,7 @@ def test_stable_release_is_draft_until_assets_are_verified_then_becomes_latest(p
     assert create["make_latest"] == "true"
     assert result["prerelease"] is False and result["draft"] is False
     assert {a["name"] for a in result["assets"]} == {
-        "melcloud-diagnostics-0.4.0.zip",
+        "melcloud-diagnostics-0.4.1.zip",
         "melcloud_diagnostics.zip",
         "SHA256SUMS",
     }
@@ -167,7 +168,7 @@ def test_packages_are_reproducible_and_contain_no_local_paths(packages, tmp_path
         check=True,
         capture_output=True,
     )
-    for name in ("melcloud_diagnostics.zip", "melcloud-diagnostics-0.4.0.zip", "SHA256SUMS"):
+    for name in ("melcloud_diagnostics.zip", "melcloud-diagnostics-0.4.1.zip", "SHA256SUMS"):
         assert (packages / name).read_bytes() == (tmp_path / name).read_bytes()
     with zipfile.ZipFile(packages / "melcloud_diagnostics.zip") as archive:
         assert archive.testzip() is None
@@ -188,7 +189,7 @@ def test_release_contains_all_authentic_screenshots(packages):
         "diagnostics-collaudo-running-mobile-dark.png", "diagnostics-collaudo-running-dark.png",
     }
     assert {p.name for p in (ROOT / "docs/images").glob("*.png")} == names
-    with zipfile.ZipFile(packages / "melcloud-diagnostics-0.4.0.zip") as archive:
+    with zipfile.ZipFile(packages / "melcloud-diagnostics-0.4.1.zip") as archive:
         for name in names:
             path = ROOT / "docs/images" / name
             assert archive.read("docs/images/" + name) == path.read_bytes()
@@ -210,6 +211,6 @@ def test_release_image_links_are_pinned_to_its_tag_and_present(packages):
 
 
 def test_source_archive_documentation_order_is_lexical_on_all_platforms(packages):
-    with zipfile.ZipFile(packages / "melcloud-diagnostics-0.4.0.zip") as archive:
+    with zipfile.ZipFile(packages / "melcloud-diagnostics-0.4.1.zip") as archive:
         paths = [name for name in archive.namelist() if name.startswith("docs/")]
         assert paths == sorted(paths)

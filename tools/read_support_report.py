@@ -8,14 +8,49 @@ from pathlib import Path
 def summarize(raw):
     data = raw.get("data", raw)
     if "diagnostic_test" in data or data.get("format") == "melcloud_diagnostics.diagnostic_test":
+        from custom_components.melcloud_diagnostics.core.report_evidence import (
+            interpretable_fact,
+            observed_parameter_presence,
+        )
+        from custom_components.melcloud_diagnostics.core.test_privacy import safe_code
         from custom_components.melcloud_diagnostics.core.test_session import validate_report
 
         report = validate_report(data.get("diagnostic_test", data))
+        samples = report["temporal_observations"]
+        codes = set()
+        flags = {"true": 0, "false": 0, "unknown": 0}
+        active_p1 = False
+        for sample in samples:
+            facts = sample["facts"]
+            current_codes = {
+                code
+                for fact in facts
+                if fact["parameter"] == "ErrorCode"
+                and interpretable_fact(fact)
+                and (code := safe_code(fact["value"])) is not None
+            }
+            codes.update(current_codes)
+            flag = next((
+                f["value"] for f in facts
+                if f["parameter"] == "in_error"
+                and type(f["value"]) is bool
+                and interpretable_fact(f)
+            ), None)
+            flags["true" if flag is True else "false" if flag is False else "unknown"] += 1
+            active_p1 |= flag is True and "P1" in current_codes
+        records = report["fault_history"]["records"]
+        ftc_presence = observed_parameter_presence(report, "ftcModel")
+        ftc_observed = "yes" if ftc_presence is True else "no" if ftc_presence is False else "unknown"
         return "\n".join([
             "Diagnostic test (read only)",
             f"Status: {report['session']['status']}",
             f"Acquisition counts: {report['acquisition']['successful']} successful, {report['acquisition']['failed']} failed",
             f"History: {report['fault_history']['status']}",
+            f"Current interpretable error codes: {', '.join(sorted(codes)) or 'none observed'}",
+            f"Active fault flag (samples): true={flags['true']}, false={flags['false']}, unknown={flags['unknown']}",
+            f"Active P1 observed: {str(active_p1).lower()}",
+            f"Historical records: {len(records)}; historical P1 records: {sum(r['code'] == 'P1' for r in records)} (not an episode count)",
+            f"FTC declared generation: {report['ftc_capabilities']['declared_generation']}; ftcModel field observed: {ftc_observed}",
             f"Checks: {json.dumps(report['verification_results'])}",
             "Physical accuracy: UNKNOWN",
         ])
