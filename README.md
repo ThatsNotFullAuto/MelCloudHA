@@ -60,6 +60,8 @@ La 0.4.1 corregge le assenze dichiarate nel report: un campo presente senza
 valore utilizzabile non diventa automaticamente assente nel cloud. Schema 1,
 contatori normalizzati, ID e journal sono conservati. I metadati aggregati non
 certificano la corrispondenza temporale fra ogni frame e ogni lettura.
+Le etichette esplicite come `ftC7` sono riconosciute come `FTC7`, senza dedurre
+capacità aggiuntive e senza cambiare il testo originale del sensore.
 
 Temperature e impostazioni osservabili, stato operativo, codice guasto,
 storico errori quando disponibile, ricorrenze P1, report esportabili e una

@@ -18,6 +18,9 @@ impianti FTC restano non verificate. Nessun dato privato nelle fixture.
   un alias. Fatti missing, stale o invalidi non attestano un P1 attivo.
 - Il lettore offline separa codici correnti, flag attivo e record storici/P1;
   la presenza di ftcModel non certifica una generazione riconosciuta.
+- Riconoscimento delle etichette esplicite FTC4–FTC7 con maiuscole miste e spazi
+  esterni (`ftC7` → `FTC7`), mantenendo il testo originale nel sensore.
+  Nessuna deduzione da modello o firmware e nessuna capacità hardware certificata.
 - Protezione Git dei download diagnostici privati. Le regressioni usano soltanto
   dati sintetici, senza copie del report dell'utente.
 

@@ -5,6 +5,11 @@ Data: 10 novembre 2026. Documento di pianificazione, non annuncio di release.
 Esecuzione dell'incremento A: [note e aggiornamento 0.4.1](RELEASE_041.md).
 L'incremento B descritto qui resta una possibilità futura, non implementata.
 
+Aggiornamento dell'esecuzione: il valore dichiarato fornito dall'utente è `ftC7`.
+La 0.4.1 normalizza soltanto maiuscole e spazi esterni delle etichette esplicite
+FTC4–FTC7, senza deduzioni da modelli o firmware. Il sensore resta invariato e
+le capacità non diventano verificate. I report precedenti non sono riclassificati.
+
 ## 1. Obiettivo e stato di partenza
 
 Produrre un primo incremento locale che corregga le ambiguità del report 0.4.0,

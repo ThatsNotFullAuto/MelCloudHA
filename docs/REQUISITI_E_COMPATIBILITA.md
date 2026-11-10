@@ -68,6 +68,12 @@ Versioni e risultati della verifica sono nel [rapporto frontend](VERIFICA_FRONTE
 
 ## Compatibilità FTC4–FTC7 e sorgenti
 
+Le etichette esplicite FTC4–FTC7 sono riconosciute anche con maiuscole miste
+e spazi esterni (ad esempio `ftC7`). È una dichiarazione del cloud, non una
+verifica fisica. Modello dell'unità e firmware non determinano la generazione.
+Il sensore mostra ancora il testo originale. I vecchi report `unknown` non
+vengono riclassificati senza nuove acquisizioni.
+
 | Generazione | Modello diagnostico | MELCloud Home per quella generazione | CN105/Asgard locale | Importazione SD/report di servizio |
 |---|---|---|---|---|
 | FTC4 | Implementato, fixture sintetiche | **Unknown** sull'impianto reale | Non implementata | Non implementata |

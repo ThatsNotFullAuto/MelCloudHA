@@ -21,7 +21,10 @@ I dati privati non sono inclusi nella repository o nelle fixture pubbliche.
 - `code_readable` conserva il significato di codice corrente interpretabile;
   può essere falso anche quando lo storico contiene P1 leggibili.
 - Un FTC `unknown` può avere un campo `ftcModel` presente ma non riconosciuto.
-  Non viene introdotta alcuna equivalenza non documentata con FTC7.
+  Le sole etichette esplicite FTC4–FTC7 vengono riconosciute anche con maiuscole
+  miste e spazi esterni: ad esempio `ftC7` diventa `FTC7`. Il sensore conserva
+  il testo originale; modelli di unità e numeri firmware non vengono interpretati.
+  Il riconoscimento della dichiarazione non certifica capacità hardware o cloud.
 
 I contatori `decoded_parameters` mantengono la semantica dei valori normalizzati.
 La lista degli assenti vuota non dimostra completezza del cloud. I metadati di
@@ -58,6 +61,8 @@ nei limiti delle evidenze disponibili. Il file originale esportato dall'utente
 non viene riscritto. Lo schema e il significato dei contatori restano invariati.
 
 Una sessione precedente conserva la versione software originaria nei metadati.
+La normalizzazione FTC corretta si applica alle nuove acquisizioni: un vecchio
+report `unknown` non contiene il testo originale necessario per riclassificarlo.
 Per registrare una sessione con versione 0.4.1, esportare prima la precedente,
 poi avviare un Collaudo autorizzato di **20 minuti**, consentendone la sostituzione.
 Confrontare nell'app soltanto le letture già visibili. Non cambiare setpoint,

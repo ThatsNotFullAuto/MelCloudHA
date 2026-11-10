@@ -16,7 +16,10 @@ class FTCGeneration(StrEnum):
     @classmethod
     def from_declared(cls, value: str | None) -> "FTCGeneration":
         # A unit model name, firmware number or presumed generation is not identification.
-        return next((item for item in cls if item.value == value), cls.UNKNOWN)
+        if not isinstance(value, str) or len(value) > 16:
+            return cls.UNKNOWN
+        declared = value.strip().upper()
+        return next((item for item in cls if item.value == declared), cls.UNKNOWN)
 
 
 class Source(StrEnum):
